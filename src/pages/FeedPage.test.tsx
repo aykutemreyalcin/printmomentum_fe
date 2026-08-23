@@ -72,7 +72,7 @@ describe('FeedPage', () => {
     await user.type(screen.getByLabelText('Max days to top'), '7')
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?maxDaysToTop=7')
+      expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?maxDaysToTop=7', { headers: {} })
     })
   })
 
@@ -87,7 +87,7 @@ describe('FeedPage', () => {
     )
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?maxDaysToTop=7')
+      expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?maxDaysToTop=7', { headers: {} })
     })
   })
 

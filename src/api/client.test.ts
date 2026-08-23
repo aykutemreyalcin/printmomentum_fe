@@ -28,6 +28,7 @@ function jsonResponse(body: unknown, status = 200, contentType = 'application/js
 describe('api client', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
   })
 
   it('maps a listings page from GET /api/v1/listings', async () => {
@@ -37,7 +38,7 @@ describe('api client', () => {
 
     const result = await getListings({ q: 'graphic', size: 20 })
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?size=20&q=graphic')
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?size=20&q=graphic', { headers: {} })
     expect(result.items).toHaveLength(1)
     expect(result.items[0].listingId).toBe(9101)
     expect(result.items[0].daysToTop).toBe(2.0)
@@ -74,7 +75,7 @@ describe('api client', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(getHealth()).resolves.toEqual({ status: 'ok', service: 'printmomentum-be' })
-    expect(fetchMock).toHaveBeenCalledWith('/api/v1/health')
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/health', { headers: {} })
   })
 
   it('maps listing detail including snapshots', async () => {
@@ -91,8 +92,22 @@ describe('api client', () => {
 
     const detail = await getListing(9101)
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings/9101')
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings/9101', { headers: {} })
     expect(detail.snapshots).toHaveLength(2)
     expect(detail.snapshots[1].position).toBe(40)
+  })
+
+  it('sends X-Api-Key when VITE_API_KEY is set', async () => {
+    vi.stubEnv('VITE_API_KEY', 'dev-local-printmomentum')
+    const fetchMock = vi.fn().mockResolvedValue(
+      jsonResponse({ items: [], page: 0, size: 20, total: 0 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await getListings()
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings', {
+      headers: { 'X-Api-Key': 'dev-local-printmomentum' },
+    })
   })
 })
