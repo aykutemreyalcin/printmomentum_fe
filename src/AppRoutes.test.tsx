@@ -28,17 +28,16 @@ describe('AppRoutes', () => {
     expect(screen.getByRole('heading', { name: /not tees that sat/i })).toBeInTheDocument()
   })
 
-  it('renders the listing detail route for an id', () => {
+  it('renders the listing detail route for an id', async () => {
     renderAt('/listings/1147645830')
 
-    expect(screen.getByText('Listing 1147645830')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Listing detail' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Graphic DTG Print Tee' })).toBeInTheDocument()
   })
 
   it('navigates from detail back to the feed', async () => {
     renderAt('/listings/1147645830')
 
-    await userEvent.click(screen.getByRole('link', { name: /back to feed/i }))
+    await userEvent.click(await screen.findByRole('link', { name: /back to feed/i }))
 
     expect(screen.getByRole('heading', { name: /not tees that sat/i })).toBeInTheDocument()
   })

@@ -18,14 +18,46 @@ export function listingFixture(overrides: Record<string, unknown> = {}) {
   }
 }
 
-export function stubApi(options: { items?: unknown[]; ok?: boolean; status?: number } = {}) {
+export function detailFixture(overrides: Record<string, unknown> = {}) {
+  return listingFixture({
+    snapshots: [
+      { observedAt: '2026-08-20T10:00:00Z', position: 5, numFavorers: 20 },
+      { observedAt: '2026-08-21T10:00:00Z', position: 40, numFavorers: 31 },
+    ],
+    ...overrides,
+  })
+}
+
+export function stubApi(
+  options: {
+    items?: unknown[]
+    detail?: unknown
+    ok?: boolean
+    status?: number
+    detailOk?: boolean
+    detailStatus?: number
+  } = {},
+) {
   const items = options.items ?? []
   const ok = options.ok ?? true
   const status = options.status ?? (ok ? 200 : 500)
+  const detailOk = options.detailOk ?? true
+  const detailStatus = options.detailStatus ?? (detailOk ? 200 : 404)
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input)
+      const detailMatch = url.match(/\/v1\/listings\/(\d+)/)
+      if (detailMatch) {
+        return {
+          ok: detailOk,
+          status: detailStatus,
+          json: async () =>
+            detailOk
+              ? (options.detail ?? detailFixture({ listingId: Number(detailMatch[1]) }))
+              : { title: 'Not Found', status: detailStatus, detail: 'listing not found' },
+        }
+      }
       if (url.includes('/v1/listings')) {
         return {
           ok,
