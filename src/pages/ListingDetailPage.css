@@ -1,0 +1,32 @@
+.detail {
+  padding: clamp(34px, 6vw, 72px) 0 0;
+}
+
+.detail-back {
+  display: inline-block;
+  margin-bottom: clamp(28px, 5vw, 56px);
+  transition: transform 0.3s var(--ease);
+}
+
+.detail-back:hover {
+  transform: translateX(-4px);
+  color: var(--ink);
+}
+
+.detail-title {
+  margin-top: 10px;
+  font-size: clamp(32px, 5vw, 62px);
+  padding-bottom: clamp(28px, 5vw, 52px);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  padding-top: 26px;
+}
+
+.detail-value {
+  margin-top: 8px;
+  font-size: 26px;
+}

@@ -1,0 +1,97 @@
+.feed-hero {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: clamp(28px, 6vw, 90px);
+  align-items: end;
+  padding: clamp(48px, 9vw, 108px) 0 clamp(38px, 7vw, 76px);
+}
+
+.feed-headline {
+  font-size: clamp(42px, 7.4vw, 100px);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+
+.feed-headline i {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.feed-hero-side p {
+  max-width: 44ch;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.feed-row {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 92px 92px 92px 118px;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--hair);
+}
+
+.feed-row-head {
+  padding: 14px 0;
+}
+
+.feed-row-head span:nth-child(n + 3) {
+  text-align: right;
+}
+
+/* Placeholder bars until the feed is wired to /api/v1/listings. */
+.feed-bar {
+  height: 11px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--paper-raised) 0%,
+    #e5e1d7 50%,
+    var(--paper-raised) 100%
+  );
+  background-size: 200% 100%;
+  animation: feed-shimmer 1.6s ease-in-out infinite;
+}
+
+.feed-row-skeleton:nth-child(3) .feed-bar {
+  animation-delay: 0.15s;
+}
+
+.feed-row-skeleton:nth-child(4) .feed-bar {
+  animation-delay: 0.3s;
+}
+
+@keyframes feed-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.feed-note {
+  display: block;
+  padding-top: 18px;
+}
+
+@media (max-width: 900px) {
+  .feed-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .feed-row {
+    grid-template-columns: 40px minmax(0, 1fr) 70px;
+  }
+
+  .feed-row > :nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-bar {
+    animation: none;
+  }
+}

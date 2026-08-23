@@ -1,0 +1,20 @@
+.api-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.api-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.api-status.is-down {
+  color: var(--signal);
+}
+
+.api-status.is-down .api-status-dot {
+  background: var(--signal);
+}
