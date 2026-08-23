@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from './AppRoutes'
+import { stubApi } from './test/stubApi'
 
 const renderAt = (path: string) =>
   render(
@@ -13,13 +14,7 @@ const renderAt = (path: string) =>
 
 describe('AppRoutes', () => {
   beforeEach(() => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ status: 'ok', service: 'printmomentum-be' }),
-      }),
-    )
+    stubApi({ items: [] })
   })
 
   afterEach(() => {
