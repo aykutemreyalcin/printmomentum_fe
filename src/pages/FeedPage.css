@@ -142,6 +142,27 @@
   padding-top: 18px;
 }
 
+.feed-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 16px 24px;
+}
+
+.feed-retry {
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.feed-retry:hover {
+  color: var(--signal);
+  border-bottom-color: var(--signal);
+}
+
 @media (max-width: 900px) {
   .feed-hero {
     grid-template-columns: 1fr;

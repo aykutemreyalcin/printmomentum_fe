@@ -90,4 +90,40 @@ describe('FeedPage', () => {
       expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?maxDaysToTop=7')
     })
   })
+
+  it('recovers the feed after retrying a 503', async () => {
+    const listing = listingFixture({ title: 'Y2K Chrome Butterfly Baby Tee' })
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        json: async () => ({
+          title: 'Service Unavailable',
+          status: 503,
+          detail: 'Etsy Open API is unavailable',
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ items: [listing], page: 0, size: 20, total: 1 }),
+      })
+    vi.stubGlobal('fetch', fetchMock)
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <FeedPage />
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Service Unavailable')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }))
+
+    expect(await screen.findByText('Y2K Chrome Butterfly Baby Tee')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
 })

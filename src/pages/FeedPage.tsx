@@ -9,7 +9,7 @@ const columns = ['Rank', 'Listing', 'Days to top', 'Momentum']
 
 export function FeedPage() {
   const filters = useFeedFilters()
-  const { page, error, loading, sample } = useListings(filters.query)
+  const { page, error, loading, sample, retry } = useListings(filters.query)
   const items = page?.items ?? []
 
   return (
@@ -57,9 +57,12 @@ export function FeedPage() {
         {loading && <FeedSkeleton />}
 
         {!loading && error && (
-          <p className="feed-note" role="alert">
-            {error}
-          </p>
+          <div className="feed-error" role="alert">
+            <p className="feed-note">{error}</p>
+            <button type="button" className="feed-retry label" onClick={retry}>
+              Retry
+            </button>
+          </div>
         )}
 
         {!loading && !error && items.length === 0 && (
