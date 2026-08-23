@@ -58,6 +58,18 @@ describe('FeedPage', () => {
     expect(screen.getByTestId('feed-skeleton')).toBeInTheDocument()
   })
 
+  it('uses a 3-column desktop feed grid', async () => {
+    stubApi({ items: [] })
+    const { container } = render(
+      <MemoryRouter>
+        <FeedPage />
+      </MemoryRouter>,
+    )
+
+    await screen.findByText('No printable tees match. Widen filters.')
+    expect(container.querySelector('.feed-grid')).toBeInTheDocument()
+  })
+
   it('calls the listings API with maxDaysToTop=7 when the filter is set', async () => {
     stubApi({ items: [] })
     const fetchMock = vi.mocked(fetch)

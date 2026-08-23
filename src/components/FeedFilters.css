@@ -45,3 +45,9 @@
     grid-column: 1 / -1;
   }
 }
+
+@media (max-width: 400px) {
+  .feed-filters {
+    grid-template-columns: 1fr;
+  }
+}
