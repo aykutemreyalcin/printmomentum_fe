@@ -27,7 +27,7 @@
 
 .feed-row {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) 92px 92px 92px 118px;
+  grid-template-columns: 54px minmax(0, 1fr) 92px 92px;
   align-items: center;
   gap: 18px;
   padding: 20px 0;
@@ -42,7 +42,74 @@
   text-align: right;
 }
 
-/* Placeholder bars until the feed is wired to /api/v1/listings. */
+.feed-rank {
+  color: var(--muted);
+}
+
+.feed-listing {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  transition: transform 0.35s var(--ease);
+}
+
+.feed-listing:hover {
+  transform: translateX(6px);
+}
+
+.feed-listing img,
+.feed-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  background: var(--paper-raised);
+  border: 1px solid var(--hair);
+}
+
+.feed-listing h3 {
+  font-size: clamp(17px, 1.8vw, 22px);
+  letter-spacing: -0.028em;
+  line-height: 1.18;
+}
+
+.feed-listing p {
+  margin-top: 5px;
+}
+
+.feed-num {
+  text-align: right;
+  font-size: 19px;
+}
+
+.feed-num small {
+  display: block;
+  margin-top: 3px;
+  font: 400 10px/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.feed-momentum {
+  font-size: 24px;
+}
+
+.feed-empty {
+  margin: 28px 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.feed-sample {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 5px 10px;
+  border: 1px solid var(--signal);
+  border-radius: 999px;
+  color: var(--signal);
+}
 .feed-bar {
   height: 11px;
   border-radius: 2px;
@@ -82,10 +149,11 @@
   }
 
   .feed-row {
-    grid-template-columns: 40px minmax(0, 1fr) 70px;
+    grid-template-columns: 40px minmax(0, 1fr);
   }
 
-  .feed-row > :nth-child(n + 4) {
+  .feed-row-head span:nth-child(n + 3),
+  .feed-num {
     display: none;
   }
 }
