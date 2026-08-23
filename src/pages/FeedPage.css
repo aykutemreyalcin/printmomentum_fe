@@ -25,21 +25,31 @@
   font-size: 15px;
 }
 
-.feed-row {
+.feed-grid,
+.feed-skeleton {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) 92px 92px;
-  align-items: center;
-  gap: 18px;
-  padding: 20px 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px 24px;
+  padding: 28px 0 12px;
+}
+
+.feed-skeleton {
+  padding: 0;
+  grid-column: 1 / -1;
+}
+
+.feed-error,
+.feed-empty {
+  grid-column: 1 / -1;
+}
+
+.feed-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--hair);
-}
-
-.feed-row-head {
-  padding: 14px 0;
-}
-
-.feed-row-head span:nth-child(n + 3) {
-  text-align: right;
 }
 
 .feed-rank {
@@ -48,38 +58,33 @@
 
 .feed-listing {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  align-items: center;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
-  transition: transform 0.35s var(--ease);
-}
-
-.feed-listing:hover {
-  transform: translateX(6px);
 }
 
 .feed-listing img,
 .feed-thumb {
-  width: 56px;
-  height: 56px;
+  width: 100%;
+  aspect-ratio: 1;
+  height: auto;
   object-fit: cover;
   background: var(--paper-raised);
   border: 1px solid var(--hair);
 }
 
 .feed-listing h3 {
-  font-size: clamp(17px, 1.8vw, 22px);
+  font-size: clamp(17px, 1.6vw, 22px);
   letter-spacing: -0.028em;
   line-height: 1.18;
 }
 
-.feed-listing p {
-  margin-top: 5px;
+.feed-card-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .feed-num {
-  text-align: right;
   font-size: 19px;
 }
 
@@ -111,7 +116,9 @@
   color: var(--signal);
 }
 .feed-bar {
+  display: block;
   height: 11px;
+  margin-bottom: 10px;
   border-radius: 2px;
   background: linear-gradient(
     90deg,
@@ -123,11 +130,11 @@
   animation: feed-shimmer 1.6s ease-in-out infinite;
 }
 
-.feed-row-skeleton:nth-child(3) .feed-bar {
+.feed-card-skeleton:nth-child(2) .feed-bar {
   animation-delay: 0.15s;
 }
 
-.feed-row-skeleton:nth-child(4) .feed-bar {
+.feed-card-skeleton:nth-child(3) .feed-bar {
   animation-delay: 0.3s;
 }
 
@@ -169,13 +176,9 @@
     align-items: start;
   }
 
-  .feed-row {
-    grid-template-columns: 40px minmax(0, 1fr);
-  }
-
-  .feed-row-head span:nth-child(n + 3),
-  .feed-num {
-    display: none;
+  .feed-grid,
+  .feed-skeleton {
+    grid-template-columns: 1fr;
   }
 }
 

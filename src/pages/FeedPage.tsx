@@ -5,8 +5,6 @@ import { useFeedFilters } from '../hooks/useFeedFilters'
 import { useListings } from '../hooks/useListings'
 import './FeedPage.css'
 
-const columns = ['Rank', 'Listing', 'Days to top', 'Momentum']
-
 export function FeedPage() {
   const filters = useFeedFilters()
   const { page, error, loading, sample, retry } = useListings(filters.query)
@@ -45,15 +43,7 @@ export function FeedPage() {
         onQ={filters.setQ}
       />
 
-      <div className="feed-table">
-        <div className="feed-row feed-row-head">
-          {columns.map((column) => (
-            <span className="label" key={column}>
-              {column}
-            </span>
-          ))}
-        </div>
-
+      <div className="feed-grid">
         {loading && <FeedSkeleton />}
 
         {!loading && error && (
@@ -86,13 +76,12 @@ export function FeedPage() {
 
 function FeedSkeleton() {
   return (
-    <div data-testid="feed-skeleton" aria-busy="true">
+    <div className="feed-skeleton" data-testid="feed-skeleton" aria-busy="true">
       {[0, 1, 2].map((row) => (
-        <div className="feed-row feed-row-skeleton" key={row} aria-hidden="true">
-          <span className="feed-bar" style={{ width: '40%' }} />
+        <div className="feed-card feed-card-skeleton" key={row} aria-hidden="true">
+          <span className="feed-bar" style={{ width: '100%', height: '180px' }} />
           <span className="feed-bar" style={{ width: '82%' }} />
           <span className="feed-bar" style={{ width: '48%' }} />
-          <span className="feed-bar" style={{ width: '52%' }} />
         </div>
       ))}
     </div>
