@@ -8,6 +8,7 @@ import type {
 } from './types'
 
 const API_BASE = '/api'
+const API_KEY_HEADER = 'X-Api-Key'
 
 export async function getHealth(): Promise<Health> {
   return request('/v1/health')
@@ -34,11 +35,19 @@ export async function getListing(
 }
 
 async function request<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`)
+  const response = await fetch(`${API_BASE}${path}`, { headers: apiHeaders() })
   if (!response.ok) {
     throw await ApiError.fromResponse(response)
   }
   return (await response.json()) as T
+}
+
+export function apiHeaders(): HeadersInit {
+  const apiKey = import.meta.env.VITE_API_KEY
+  if (typeof apiKey === 'string' && apiKey.length > 0) {
+    return { [API_KEY_HEADER]: apiKey }
+  }
+  return {}
 }
 
 function toQuery(params: Record<string, string | number | boolean | undefined>): string {
