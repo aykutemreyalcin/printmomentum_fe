@@ -30,3 +30,47 @@
   margin-top: 8px;
   font-size: 26px;
 }
+
+.detail-image {
+  display: block;
+  width: min(320px, 100%);
+  height: auto;
+  margin: 0 0 28px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--paper-raised);
+  border: 1px solid var(--hair);
+}
+
+.detail-trend {
+  padding-top: 36px;
+}
+
+.detail-spark {
+  display: block;
+  width: min(320px, 100%);
+  height: 72px;
+  margin-top: 12px;
+  color: var(--ink);
+}
+
+.detail-spark-empty,
+.detail-note {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.detail-etsy {
+  display: inline-block;
+  margin-top: 36px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--ink);
+}
+
+.detail-bar {
+  display: block;
+  height: 14px;
+  margin: 14px 0;
+  border-radius: 2px;
+  background: var(--paper-raised);
+}
