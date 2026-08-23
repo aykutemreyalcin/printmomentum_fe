@@ -1,0 +1,13 @@
+---
+description: PrintMomentum frontend conventions. Always apply so the agent does not mix Next.js patterns or re-spec the product.
+alwaysApply: true
+---
+
+# PrintMomentum FE
+
+- Vite + React 19 SPA. Not Next.js. No App Router, no server actions.
+- API base is `/api` (dev proxy to Spring Boot `:8080`).
+- Ranked **printable** tees by climb speed. Do not show non-print apparel.
+- Read `.cursor/skills/` instead of browsing React/Etsy docs.
+- One branch per `docs/TASKS.csv` row.
+- `npm test` and `npm run build` must pass.
