@@ -1,12 +1,15 @@
-import { Reveal } from '../components/Reveal'
+import { FeedFilters } from '../components/FeedFilters'
 import { ListingRow } from '../components/ListingRow'
+import { Reveal } from '../components/Reveal'
+import { useFeedFilters } from '../hooks/useFeedFilters'
 import { useListings } from '../hooks/useListings'
 import './FeedPage.css'
 
 const columns = ['Rank', 'Listing', 'Days to top', 'Momentum']
 
 export function FeedPage() {
-  const { page, error, loading, sample } = useListings()
+  const filters = useFeedFilters()
+  const { page, error, loading, sample } = useListings(filters.query)
   const items = page?.items ?? []
 
   return (
@@ -32,6 +35,15 @@ export function FeedPage() {
       )}
 
       <hr className="hairline" />
+
+      <FeedFilters
+        maxDaysToTop={filters.maxDaysToTop}
+        minScore={filters.minScore}
+        q={filters.q}
+        onMaxDaysToTop={filters.setMaxDaysToTop}
+        onMinScore={filters.setMinScore}
+        onQ={filters.setQ}
+      />
 
       <div className="feed-table">
         <div className="feed-row feed-row-head">

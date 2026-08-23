@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeedPage } from './FeedPage'
@@ -55,5 +56,38 @@ describe('FeedPage', () => {
     )
 
     expect(screen.getByTestId('feed-skeleton')).toBeInTheDocument()
+  })
+
+  it('calls the listings API with maxDaysToTop=7 when the filter is set', async () => {
+    stubApi({ items: [] })
+    const fetchMock = vi.mocked(fetch)
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <FeedPage />
+      </MemoryRouter>,
+    )
+
+    await user.type(screen.getByLabelText('Max days to top'), '7')
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?maxDaysToTop=7')
+    })
+  })
+
+  it('reads maxDaysToTop from the URL on load', async () => {
+    stubApi({ items: [] })
+    const fetchMock = vi.mocked(fetch)
+
+    render(
+      <MemoryRouter initialEntries={['/?maxDaysToTop=7']}>
+        <FeedPage />
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?maxDaysToTop=7')
+    })
   })
 })
