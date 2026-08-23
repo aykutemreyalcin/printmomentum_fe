@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
+import { getHealth } from '../api/client'
+import type { Health } from '../api/types'
 import './ApiStatus.css'
-
-type Health = {
-  status: string
-  service: string
-}
 
 export function ApiStatus() {
   const [health, setHealth] = useState<Health | null>(null)
@@ -12,13 +9,7 @@ export function ApiStatus() {
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/v1/health')
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`)
-        }
-        return (await response.json()) as Health
-      })
+    getHealth()
       .then((value) => {
         if (!cancelled) setHealth(value)
       })
