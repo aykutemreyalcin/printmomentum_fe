@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from './ApiError'
-import { getHealth, getListing, getListings, getQueryStats, getShop } from './client'
+import { changePassword, getHealth, getListing, getListings, getQueryStats, getShop, registerUser } from './client'
 import type { ListingPage } from './types'
 
 const listing = {
@@ -161,6 +161,53 @@ describe('api client', () => {
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/v1/listings/9101/favorite',
       expect.objectContaining({ method: 'PUT', credentials: 'include' }),
+    )
+  })
+
+  it('patches the current user password', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 202,
+      json: async () => ({}),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await changePassword({
+      currentPassword: 'User123!',
+      newPassword: 'NewPass1',
+      confirmationPassword: 'NewPass1',
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/user',
+      expect.objectContaining({
+        method: 'PATCH',
+        credentials: 'include',
+        body: JSON.stringify({
+          currentPassword: 'User123!',
+          newPassword: 'NewPass1',
+          confirmationPassword: 'NewPass1',
+        }),
+      }),
+    )
+  })
+
+  it('posts a new user to register', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(4))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(
+      registerUser({
+        email: 'fresh@printmomentum.local',
+        password: 'Secret1',
+        name: 'Fresh',
+        role: 'user',
+      }),
+    ).resolves.toBe(4)
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/user/register',
+      expect.objectContaining({ method: 'POST', credentials: 'include' }),
     )
   })
 })
