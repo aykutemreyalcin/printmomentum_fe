@@ -1,0 +1,31 @@
+.query-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.query-stat {
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+  padding: 8px 12px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+}
+
+.query-stat:hover {
+  border-color: var(--ink);
+}
+
+.query-stat.is-on {
+  border-color: var(--ink);
+  background: var(--canvas);
+}
+
+.query-stat-name {
+  font: 600 13px/1.2 var(--sans);
+}

@@ -9,24 +9,45 @@ export function useFeedFilters() {
   const maxDaysToTop = searchParams.get('maxDaysToTop') ?? ''
   const minScore = searchParams.get('minScore') ?? ''
   const q = searchParams.get('q') ?? ''
+  const preset = searchParams.get('preset') ?? ''
+  const shopId = searchParams.get('shopId') ?? ''
+  const bestseller = searchParams.get('bestseller') === 'true'
   const debouncedQ = useDebouncedValue(q, SEARCH_DEBOUNCE_MS)
 
   return {
     maxDaysToTop,
     minScore,
     q,
-    query: toListingsQuery(maxDaysToTop, minScore, debouncedQ),
+    preset,
+    shopId,
+    bestseller,
+    query: toListingsQuery(maxDaysToTop, minScore, debouncedQ, preset, shopId, bestseller),
     setMaxDaysToTop: (value: string) => patchSearchParams(setSearchParams, { maxDaysToTop: value }),
     setMinScore: (value: string) => patchSearchParams(setSearchParams, { minScore: value }),
     setQ: (value: string) => patchSearchParams(setSearchParams, { q: value }),
+    setPreset: (value: string) => patchSearchParams(setSearchParams, { preset: value }),
+    setShopId: (value: string) => patchSearchParams(setSearchParams, { shopId: value }),
+    setBestseller: (value: boolean) => patchSearchParams(setSearchParams, { bestseller: value ? 'true' : '' }),
   }
 }
 
-function toListingsQuery(maxDaysToTop: string, minScore: string, q: string): ListingsQuery {
+function toListingsQuery(
+  maxDaysToTop: string,
+  minScore: string,
+  q: string,
+  preset: string,
+  shopId: string,
+  bestseller: boolean,
+): ListingsQuery {
   return {
     maxDaysToTop: parseOptionalNumber(maxDaysToTop),
     minScore: parseOptionalNumber(minScore),
     q: q === '' ? undefined : q,
+    preset: preset === '' ? undefined : preset,
+    shopId: parseOptionalNumber(shopId),
+    bestseller: bestseller ? true : undefined,
+    page: 0,
+    size: 100,
   }
 }
 

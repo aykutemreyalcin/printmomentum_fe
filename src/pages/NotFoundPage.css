@@ -1,0 +1,9 @@
+.not-found h2 {
+  margin-top: 8px;
+  font-size: 28px;
+}
+
+.not-found-back {
+  display: inline-block;
+  margin-top: 16px;
+}

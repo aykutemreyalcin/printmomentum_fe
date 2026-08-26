@@ -12,9 +12,9 @@
 }
 
 .api-status.is-down {
-  color: var(--signal);
+  color: var(--danger);
 }
 
 .api-status.is-down .api-status-dot {
-  background: var(--signal);
+  background: var(--danger);
 }

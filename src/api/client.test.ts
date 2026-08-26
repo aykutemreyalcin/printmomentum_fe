@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from './ApiError'
-import { getHealth, getListing, getListings } from './client'
+import { getHealth, getListing, getListings, getQueryStats, getShop } from './client'
 import type { ListingPage } from './types'
 
 const listing = {
@@ -27,6 +27,7 @@ function jsonResponse(body: unknown, status = 200, contentType = 'application/js
 
 describe('api client', () => {
   afterEach(() => {
+    localStorage.clear()
     vi.unstubAllGlobals()
     vi.unstubAllEnvs()
   })
@@ -38,7 +39,10 @@ describe('api client', () => {
 
     const result = await getListings({ q: 'graphic', size: 20 })
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings?size=20&q=graphic', { headers: {} })
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/listings?size=20&q=graphic',
+      expect.objectContaining({ credentials: 'include' }),
+    )
     expect(result.items).toHaveLength(1)
     expect(result.items[0].listingId).toBe(9101)
     expect(result.items[0].daysToTop).toBe(2.0)
@@ -75,7 +79,10 @@ describe('api client', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(getHealth()).resolves.toEqual({ status: 'ok', service: 'printmomentum-be' })
-    expect(fetchMock).toHaveBeenCalledWith('/api/v1/health', { headers: {} })
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/health',
+      expect.objectContaining({ credentials: 'include' }),
+    )
   })
 
   it('maps listing detail including snapshots', async () => {
@@ -92,13 +99,41 @@ describe('api client', () => {
 
     const detail = await getListing(9101)
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings/9101', { headers: {} })
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/listings/9101',
+      expect.objectContaining({ credentials: 'include' }),
+    )
     expect(detail.snapshots).toHaveLength(2)
     expect(detail.snapshots[1].position).toBe(40)
   })
 
-  it('sends X-Api-Key when VITE_API_KEY is set', async () => {
-    vi.stubEnv('VITE_API_KEY', 'dev-local-printmomentum')
+  it('maps shop and query-stats', async () => {
+    const shop = {
+      shopId: 44,
+      name: 'Atlas Prints',
+      url: 'https://www.etsy.com/shop/AtlasPrints',
+      indexedListingCount: 1,
+    }
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse(shop))
+      .mockResolvedValueOnce(jsonResponse([{ query: 'graphic tee', observedDay: '2026-08-26', listingCount: 4 }]))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(getShop(44)).resolves.toEqual(shop)
+    await expect(getQueryStats()).resolves.toEqual([
+      { query: 'graphic tee', observedDay: '2026-08-26', listingCount: 4 },
+    ])
+    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/v1/shops/44', expect.objectContaining({ credentials: 'include' }))
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/v1/query-stats',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+  })
+
+  it('sends Bearer token when auth is stored', async () => {
+    localStorage.setItem('printmomentum-auth-v1', JSON.stringify({ token: 'jwt-token' }))
     const fetchMock = vi.fn().mockResolvedValue(
       jsonResponse({ items: [], page: 0, size: 20, total: 0 }),
     )
@@ -107,7 +142,25 @@ describe('api client', () => {
     await getListings()
 
     expect(fetchMock).toHaveBeenCalledWith('/api/v1/listings', {
-      headers: { 'X-Api-Key': 'dev-local-printmomentum' },
+      credentials: 'include',
+      headers: { Accept: 'application/json', Authorization: 'Bearer jwt-token' },
     })
+  })
+
+  it('sends PUT when favoriting a listing', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      json: async () => ({}),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { setListingFavorite } = await import('./client')
+    await setListingFavorite(9101, true)
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/listings/9101/favorite',
+      expect.objectContaining({ method: 'PUT', credentials: 'include' }),
+    )
   })
 })

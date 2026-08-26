@@ -18,7 +18,7 @@ function thumbnail(index: number): string {
     '<circle cx="56" cy="56" r="26" fill="#111112"/>',
     '<rect x="26" y="40" width="60" height="8" fill="#111112"/><rect x="26" y="58" width="36" height="8" fill="#111112"/>',
     '<path d="M30 82 L56 28 L82 82 Z" fill="#111112"/>',
-    '<circle cx="44" cy="56" r="18" fill="#111112"/><circle cx="70" cy="56" r="18" fill="#b3401f"/>',
+    '<circle cx="44" cy="56" r="18" fill="#111112"/><circle cx="70" cy="56" r="18" fill="#1b84ff"/>',
     '<rect x="32" y="32" width="48" height="48" fill="none" stroke="#111112" stroke-width="8"/>',
     '<path d="M28 70 Q56 20 84 70" fill="none" stroke="#111112" stroke-width="8"/>',
   ]

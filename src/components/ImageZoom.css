@@ -1,0 +1,30 @@
+.image-zoom {
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  cursor: zoom-in;
+  border: 1px solid var(--hair);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.image-zoom img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+
+.image-zoom-pop {
+  position: fixed;
+  top: 72px;
+  right: 24px;
+  z-index: 1400;
+  width: 360px;
+  height: 360px;
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  background-color: var(--surface);
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
