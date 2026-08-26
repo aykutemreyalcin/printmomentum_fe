@@ -8,7 +8,8 @@ import './FeedPage.css'
 export function FavoritesPage() {
   usePageTitle('title.favorites')
   const { t } = useI18n()
-  const { page, error, loading, retry, toggleFavorite } = useListings({}, 'favorites')
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 })
+  const { page, error, loading, retry, toggleFavorite } = useListings({}, 'favorites', pagination)
   const [search, setSearch] = useState('')
   const items = page?.items ?? []
 
@@ -25,6 +26,10 @@ export function FavoritesPage() {
 
       <ListingFeedTable
         items={items}
+        rowCount={page?.total ?? 0}
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
+        onPaginationChange={setPagination}
         loading={loading}
         error={error}
         onRetry={retry}

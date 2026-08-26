@@ -13,7 +13,12 @@ export function ShopPage() {
   const { t } = useI18n()
   const shopId = Number(useParams().shopId)
   const { shop, error, notFound, loading } = useShop(shopId)
-  const listings = useListings({ shopId: Number.isFinite(shopId) ? shopId : undefined, page: 0, size: 100 })
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 50 })
+  const listings = useListings(
+    { shopId: Number.isFinite(shopId) ? shopId : undefined },
+    'feed',
+    pagination,
+  )
   const [search, setSearch] = useState('')
   usePageTitle(shop?.name ? `${shop.name} · PrintMomentum` : 'title.shop')
 
@@ -86,6 +91,10 @@ export function ShopPage() {
       <h3 className="shop-climbers">{t('shop.climbers')}</h3>
       <ListingFeedTable
         items={listings.page?.items ?? []}
+        rowCount={listings.page?.total ?? 0}
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
+        onPaginationChange={setPagination}
         loading={listings.loading}
         error={listings.error}
         onRetry={listings.retry}

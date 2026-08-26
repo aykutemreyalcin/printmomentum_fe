@@ -25,6 +25,10 @@ import './ListingFeedTable.css'
 
 type Props = {
   items: ListingFeedItem[]
+  rowCount: number
+  pageIndex: number
+  pageSize: number
+  onPaginationChange: (value: { pageIndex: number; pageSize: number }) => void
   loading: boolean
   error: string | null
   onRetry: () => void
@@ -76,6 +80,10 @@ const DEFAULT_VISIBILITY: MRT_VisibilityState = {
 
 export function ListingFeedTable({
   items,
+  rowCount,
+  pageIndex,
+  pageSize,
+  onPaginationChange,
   loading,
   error,
   onRetry,
@@ -100,11 +108,11 @@ export function ListingFeedTable({
     ...loadJson<MRT_VisibilityState>(VISIBILITY_KEY, {}),
   }))
   const [columnOrder, setColumnOrder] = useState<MRT_ColumnOrderState>(loadJson(ORDER_KEY, DEFAULT_ORDER))
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: loadPageSize() })
+  const pagination = useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize])
 
   useEffect(() => saveJson(VISIBILITY_KEY, columnVisibility), [columnVisibility])
   useEffect(() => saveJson(ORDER_KEY, columnOrder), [columnOrder])
-  useEffect(() => localStorage.setItem(PAGE_SIZE_KEY, String(pagination.pageSize)), [pagination.pageSize])
+  useEffect(() => localStorage.setItem(PAGE_SIZE_KEY, String(pageSize)), [pageSize])
 
   const resetColumns = useCallback(() => {
     localStorage.removeItem(VISIBILITY_KEY)
@@ -112,8 +120,8 @@ export function ListingFeedTable({
     localStorage.removeItem(PAGE_SIZE_KEY)
     setColumnVisibility({ ...DEFAULT_VISIBILITY })
     setColumnOrder([...DEFAULT_ORDER])
-    setPagination({ pageIndex: 0, pageSize: 25 })
-  }, [])
+    onPaginationChange({ pageIndex: 0, pageSize: 25 })
+  }, [onPaginationChange])
 
   const table = useMaterialReactTable({
     columns,
@@ -137,6 +145,8 @@ export function ListingFeedTable({
     enableTopToolbar: true,
     enableBottomToolbar: true,
     enablePagination: true,
+    manualPagination: true,
+    rowCount,
     enableRowActions: false,
     columnFilterDisplayMode: 'popover',
     positionGlobalFilter: 'left',
@@ -157,7 +167,10 @@ export function ListingFeedTable({
     },
     onColumnVisibilityChange: (updater) => setColumnVisibility((prev) => apply(updater, prev)),
     onColumnOrderChange: (updater) => setColumnOrder((prev) => apply(updater, prev)),
-    onPaginationChange: (updater) => setPagination((prev) => apply(updater, prev)),
+    onPaginationChange: (updater) => {
+      const next = apply(updater, pagination)
+      onPaginationChange(next)
+    },
     onGlobalFilterChange: (value) => onSearch(typeof value === 'string' ? value : ''),
     globalFilterFn: 'contains',
     muiSearchTextFieldProps: {
@@ -654,7 +667,9 @@ function saveJson(key: string, value: unknown) {
   }
 }
 
-function loadPageSize(): number {
+function loadStoredPageSize(): number {
   const stored = Number(localStorage.getItem(PAGE_SIZE_KEY))
-  return Number.isFinite(stored) && stored > 0 ? stored : 25
+  return Number.isFinite(stored) && stored > 0 ? stored : 50
 }
+
+export { loadStoredPageSize as loadFeedPageSize }
