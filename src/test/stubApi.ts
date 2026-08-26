@@ -2,7 +2,14 @@ import { expect, vi } from 'vitest'
 import type { UserResponse } from '../auth/_models'
 import { AUTH_LOCAL_STORAGE_KEY } from '../auth/_helpers'
 
-export const healthBody = { status: 'ok', service: 'printmomentum-be' }
+export const healthBody = {
+  status: 'ok',
+  service: 'printmomentum-be',
+  indexedListings: 12,
+  lastCrawlAt: null,
+  nextCrawlAt: '2026-08-26T21:00:00.000Z',
+  lastOutcome: 'never',
+}
 
 export const userBody = {
   id: 2,
@@ -11,6 +18,7 @@ export const userBody = {
   email: 'user@printmomentum.local',
   role: 'user' as const,
   active: true,
+  lastLoginAt: '2026-08-20T10:00:00Z',
 }
 
 export const adminBody = {
@@ -20,6 +28,7 @@ export const adminBody = {
   email: 'admin@printmomentum.local',
   role: 'admin' as const,
   active: true,
+  lastLoginAt: '2026-08-20T10:00:00Z',
 }
 
 export function seedAuth() {
@@ -77,6 +86,11 @@ export function stubApi(
     user?: UserResponse
     registerStatus?: number
     changePasswordStatus?: number
+    members?: UserResponse[]
+    sessions?: import('../auth/_models').UserSessionView[]
+    setActiveStatus?: number
+    updateProfile?: UserResponse
+    health?: typeof healthBody
     ok?: boolean
     status?: number
     detailOk?: boolean
@@ -106,6 +120,47 @@ export function stubApi(
             registerStatus >= 200 && registerStatus < 300
               ? 3
               : { title: 'Forbidden', status: registerStatus, detail: 'You do not have permission to access this resource.' },
+        }
+      }
+      if (/\/v1\/user\/members\/\d+\/sessions/.test(url)) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () =>
+            options.sessions ?? [
+              {
+                id: 1,
+                deviceId: 'web',
+                ipAddress: '127.0.0.1',
+                userAgent: 'Test Browser',
+                lastUsedAt: '2026-08-20T12:00:00Z',
+                createdAt: '2026-08-01T12:00:00Z',
+                expiresAt: '2026-09-01T12:00:00Z',
+                active: true,
+              },
+            ],
+        }
+      }
+      if (url.includes('/v1/user/members') && !url.includes('/sessions')) {
+        const members = options.members ?? [adminBody, userBody]
+        return { ok: true, status: 200, json: async () => members }
+      }
+      if (/\/v1\/user\/\d+/.test(url) && method === 'PATCH') {
+        const setActiveStatus = options.setActiveStatus ?? 202
+        return {
+          ok: setActiveStatus >= 200 && setActiveStatus < 300,
+          status: setActiveStatus,
+          json: async () =>
+            setActiveStatus >= 200 && setActiveStatus < 300
+              ? {}
+              : { title: 'Not Acceptable', status: setActiveStatus, detail: 'Cannot deactivate your own account' },
+        }
+      }
+      if (url.includes('/v1/user') && method === 'PUT') {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => options.updateProfile ?? { ...(options.user ?? userBody), name: 'Pat', displayName: 'Pat Print' },
         }
       }
       if (url.includes('/v1/user') && method === 'PATCH') {
@@ -192,7 +247,7 @@ export function stubApi(
       return {
         ok: true,
         status: 200,
-        json: async () => healthBody,
+        json: async () => options.health ?? healthBody,
       }
     }),
   )

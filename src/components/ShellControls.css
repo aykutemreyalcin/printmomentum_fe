@@ -1,0 +1,34 @@
+.shell-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shell-lang {
+  display: inline-flex;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.shell-lang button,
+.shell-theme {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: 600 11px/1 var(--sans);
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.shell-lang button.is-on,
+.shell-theme:hover,
+.shell-lang button:hover {
+  color: var(--ink);
+  background: var(--primary-soft);
+}
+
+.shell-theme {
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+}

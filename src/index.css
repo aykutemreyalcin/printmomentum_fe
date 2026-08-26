@@ -27,6 +27,27 @@
   color-scheme: light;
 }
 
+html[data-theme='dark'] {
+  --canvas: #0f1419;
+  --surface: #151b23;
+  --ink: #e2e8f0;
+  --muted: #94a3b8;
+  --hair: #2a3441;
+  --primary: #50a5ff;
+  --primary-hover: #1b84ff;
+  --primary-soft: #1a2a3d;
+  --info: #50a5ff;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  color-scheme: dark;
+}
+
+html[data-theme='dark'] .shell-logo,
+html[data-theme='dark'] .login-logo {
+  background: #fff;
+}
+
 *,
 *::before,
 *::after {

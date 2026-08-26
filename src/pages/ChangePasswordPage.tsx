@@ -1,11 +1,17 @@
 import { useState, type FormEvent } from 'react'
 import { ApiError } from '../api/ApiError'
 import { changePassword } from '../api/client'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { translateApiError, useI18n } from '../i18n/I18nProvider'
+import { useToast } from '../components/Toast'
 import './AccountForm.css'
 
 const MIN_PASSWORD_LENGTH = 6
 
 export function ChangePasswordPage() {
+  usePageTitle('title.password')
+  const { t } = useI18n()
+  const { showToast } = useToast()
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmationPassword, setConfirmationPassword] = useState('')
@@ -13,30 +19,29 @@ export function ChangePasswordPage() {
   const [showNew, setShowNew] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
-    setSuccess(null)
     if (newPassword.length < MIN_PASSWORD_LENGTH) {
-      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`)
+      setError(t('account.minPassword', { n: MIN_PASSWORD_LENGTH }))
       return
     }
     if (newPassword !== confirmationPassword) {
-      setError('Passwords do not match')
+      setError(t('account.mismatch'))
       return
     }
     setSubmitting(true)
     try {
       await changePassword({ currentPassword, newPassword, confirmationPassword })
-      setSuccess('Your password has been changed successfully')
+      showToast(t('account.passwordOk'))
       setCurrentPassword('')
       setNewPassword('')
       setConfirmationPassword('')
     } catch (cause) {
-      setError(cause instanceof ApiError ? (cause.detail ?? cause.message) : 'Password change failed. Please try again.')
+      const detail = cause instanceof ApiError ? cause.detail : undefined
+      setError(translateApiError(detail, t, 'account.passwordFail'))
     } finally {
       setSubmitting(false)
     }
@@ -45,46 +50,47 @@ export function ChangePasswordPage() {
   return (
     <div className="account-page">
       <div className="account-card">
-        <p className="label">Security</p>
-        <h2>Change Password</h2>
-        <p className="account-copy">Change your password to enhance your account security</p>
+        <p className="label">{t('account.security')}</p>
+        <h2>{t('account.passwordTitle')}</h2>
+        <p className="account-copy">{t('account.passwordCopy')}</p>
         {error && (
           <p className="account-alert account-alert-error" role="alert">
             {error}
           </p>
         )}
-        {success && (
-          <p className="account-alert account-alert-ok" role="status">
-            {success}
-          </p>
-        )}
         <form className="account-form" onSubmit={onSubmit} noValidate>
           <PasswordField
-            label="Current Password"
+            label={t('account.currentPassword')}
             value={currentPassword}
             onChange={setCurrentPassword}
             shown={showCurrent}
             onToggle={() => setShowCurrent((open) => !open)}
             autoComplete="current-password"
+            showLabel={t('account.show')}
+            hideLabel={t('account.hide')}
           />
           <PasswordField
-            label="New Password"
+            label={t('account.newPassword')}
             value={newPassword}
             onChange={setNewPassword}
             shown={showNew}
             onToggle={() => setShowNew((open) => !open)}
             autoComplete="new-password"
+            showLabel={t('account.show')}
+            hideLabel={t('account.hide')}
           />
           <PasswordField
-            label="Confirm New Password"
+            label={t('account.confirmPassword')}
             value={confirmationPassword}
             onChange={setConfirmationPassword}
             shown={showConfirm}
             onToggle={() => setShowConfirm((open) => !open)}
             autoComplete="new-password"
+            showLabel={t('account.show')}
+            hideLabel={t('account.hide')}
           />
           <button type="submit" disabled={submitting}>
-            {submitting ? 'Processing…' : 'Change Password'}
+            {submitting ? t('account.processing') : t('account.changePassword')}
           </button>
         </form>
       </div>
@@ -99,6 +105,8 @@ function PasswordField({
   shown,
   onToggle,
   autoComplete,
+  showLabel,
+  hideLabel,
 }: {
   label: string
   value: string
@@ -106,6 +114,8 @@ function PasswordField({
   shown: boolean
   onToggle: () => void
   autoComplete: string
+  showLabel: string
+  hideLabel: string
 }) {
   return (
     <label>
@@ -119,7 +129,7 @@ function PasswordField({
           required
         />
         <button type="button" className="account-reveal" onClick={onToggle}>
-          {shown ? 'Hide' : 'Show'}
+          {shown ? hideLabel : showLabel}
         </button>
       </span>
     </label>

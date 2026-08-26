@@ -37,6 +37,25 @@ describe('FeedPage', () => {
     expect(screen.getByRole('button', { name: 'Export CSV' })).toBeDisabled()
   })
 
+  it('explains a pending first crawl when the index has zero listings', async () => {
+    stubApi({
+      items: [],
+      health: {
+        status: 'ok',
+        service: 'printmomentum-be',
+        indexedListings: 0,
+        lastCrawlAt: null,
+        nextCrawlAt: '2026-08-26T21:00:00.000Z',
+        lastOutcome: 'never',
+      },
+    })
+
+    renderWithApp(<FeedPage />)
+
+    expect(await screen.findByText(/Index is empty/)).toBeInTheDocument()
+    expect(screen.getByText(/Europe\/Istanbul/)).toBeInTheDocument()
+  })
+
   it('shows skeletons while the feed is loading', () => {
     stubApi({ items: [] })
     vi.stubGlobal(

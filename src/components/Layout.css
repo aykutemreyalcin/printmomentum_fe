@@ -24,6 +24,21 @@
   font-weight: 700;
 }
 
+.shell-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shell-logo {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  object-fit: contain;
+  background: #fff;
+}
+
 .shell-tagline {
   margin-right: auto;
 }
@@ -130,12 +145,33 @@
   border-bottom-color: var(--ink);
 }
 
+.shell-nav-favorites {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shell-nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font: 700 10px/1 var(--mono);
+}
+
 .shell-main {
   flex: 1;
   width: 100%;
-  max-width: none;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 16px 16px 24px;
+  overflow-x: hidden;
 }
 
 @media (max-width: 700px) {

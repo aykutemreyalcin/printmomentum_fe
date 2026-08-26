@@ -1,13 +1,17 @@
 import { Link } from 'react-router'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { useI18n } from '../i18n/I18nProvider'
 import './NotFoundPage.css'
 
 export function NotFoundPage() {
+  usePageTitle('title.notFound')
+  const { t } = useI18n()
   return (
     <div className="not-found">
-      <p className="label">Error 404</p>
-      <h2>This page is not on the index.</h2>
+      <p className="label">{t('detail.error404')}</p>
+      <h2>{t('notFound.copy')}</h2>
       <Link to="/" className="label not-found-back">
-        ← Back to feed
+        {t('detail.back')}
       </Link>
     </div>
   )

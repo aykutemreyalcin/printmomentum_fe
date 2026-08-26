@@ -125,6 +125,78 @@
   background: #f0fdf4;
 }
 
+.account-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.account-secondary {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  font: 600 13px/1 var(--sans);
+}
+
+.account-secondary:hover {
+  border-color: var(--ink);
+}
+
+.account-table {
+  width: 100%;
+  margin-top: 22px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.account-table th {
+  text-align: left;
+  font: 600 11px/1 var(--sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 10px 10px 0;
+  border-bottom: 1px solid var(--hair);
+}
+
+.account-table td {
+  padding: 12px 10px 12px 0;
+  border-bottom: 1px solid var(--hair);
+  vertical-align: middle;
+}
+
+.account-table tr.is-inactive td {
+  color: var(--muted);
+}
+
+.account-row-action {
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 7px 10px;
+  font: 600 12px/1 var(--sans);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.account-row-action:hover:not(:disabled) {
+  border-color: var(--ink);
+}
+
+.account-row-action:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.metric-tip {
+  display: inline-block;
+  max-width: 100%;
+  cursor: help;
+}
+
 @media (max-width: 700px) {
   .account-grid {
     grid-template-columns: 1fr;
@@ -132,5 +204,14 @@
 
   .account-card {
     padding: 22px 18px 26px;
+  }
+
+  .account-toolbar {
+    flex-direction: column;
+  }
+
+  .account-table {
+    display: block;
+    overflow-x: auto;
   }
 }
