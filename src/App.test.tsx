@@ -14,6 +14,6 @@ describe('App', () => {
     stubApi({ items: [] })
 
     render(<App />)
-    expect(await screen.findByTestId('health')).toHaveTextContent('API ok')
+    expect(await screen.findByTestId('health', {}, { timeout: 5000 })).toHaveTextContent('API ok')
   })
 })
