@@ -4,7 +4,6 @@ import { updateProfile } from '../api/client'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { translateApiError, useI18n } from '../i18n/I18nProvider'
 import { useToast } from '../components/Toast'
-import { formatShortDate } from '../lib/format'
 import './AccountForm.css'
 
 export function ProfilePage() {

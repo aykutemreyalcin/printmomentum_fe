@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { ListingFeedTable } from '../components/ListingFeedTable'
 import { MetricTip } from '../components/MetricTip'
 import { useListings } from '../hooks/useListings'

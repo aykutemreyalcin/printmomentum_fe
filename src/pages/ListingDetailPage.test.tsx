@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { Route, Routes } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ListingDetailPage } from './ListingDetailPage'
 import { detailFixture, stubApi } from '../test/stubApi'
