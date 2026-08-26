@@ -1,12 +1,12 @@
 import { Link } from 'react-router'
-import './ListingDetailPage.css'
+import './NotFoundPage.css'
 
 export function NotFoundPage() {
   return (
-    <div className="detail">
+    <div className="not-found">
       <p className="label">Error 404</p>
-      <h2 className="detail-title">This page is not on the index.</h2>
-      <Link to="/" className="detail-back label">
+      <h2>This page is not on the index.</h2>
+      <Link to="/" className="label not-found-back">
         ← Back to feed
       </Link>
     </div>

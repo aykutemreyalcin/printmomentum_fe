@@ -1,11 +1,21 @@
-/* PrintMomentum design tokens — "Editorial Grid": paper, ink, hairlines. */
+/* PrintMomentum — Enretag-like cool canvas, one primary (Metronic blue) */
 :root {
-  --paper: #f7f6f3;
-  --paper-raised: #efece5;
-  --ink: #111112;
-  --hair: #d5d3cd;
-  --muted: #77746c;
-  --signal: #b3401f;
+  --canvas: #f5f7fa;
+  --surface: #ffffff;
+  --ink: #1e293b;
+  --muted: #64748b;
+  --hair: #e2e8f0;
+  --primary: #1b84ff;
+  --primary-hover: #056ee9;
+  --primary-soft: #e9f3ff;
+  --info: #1b84ff;
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #b91c1c;
+
+  --paper: var(--canvas);
+  --paper-raised: var(--surface);
+  --signal: var(--primary);
 
   --sans: 'Inter Tight', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
@@ -25,9 +35,9 @@
 
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--canvas);
   color: var(--ink);
-  font: 400 16px/1.5 var(--sans);
+  font: 400 14px/1.45 var(--sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -37,9 +47,9 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-weight: 500;
-  letter-spacing: -0.035em;
-  line-height: 1.06;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 p {
@@ -52,11 +62,10 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--primary);
   outline-offset: 3px;
 }
 
-/* Small uppercase mono label used across the app. */
 .label {
   font: 500 10px/1 var(--mono);
   letter-spacing: 0.1em;
@@ -67,44 +76,4 @@ a {
 .numeric {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
-}
-
-.hairline {
-  height: 1px;
-  border: 0;
-  margin: 0;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: draw 1s var(--ease) 0.15s both;
-}
-
-@keyframes draw {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-/* Fade and lift content in. Elements opt in with .reveal + .is-in. */
-.reveal {
-  opacity: 0;
-  transform: translate3d(0, var(--reveal-y, 22px), 0);
-  transition:
-    opacity 0.75s var(--ease) var(--d, 0ms),
-    transform 0.75s var(--ease) var(--d, 0ms);
-}
-
-.reveal.is-in {
-  opacity: 1;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .hairline {
-    opacity: 1;
-    transform: none;
-    animation: none;
-    transition: none;
-  }
 }

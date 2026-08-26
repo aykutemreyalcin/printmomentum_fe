@@ -1,0 +1,25 @@
+.tag-pack-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-pack-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 10px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--canvas);
+  font-size: 12px;
+}

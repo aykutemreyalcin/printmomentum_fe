@@ -1,17 +1,24 @@
 import { ApiError } from './ApiError'
+import * as authHelper from '../auth/_helpers'
+import type { UserResponse } from '../auth/_models'
 import type {
   Health,
   ListingDetail,
   ListingDetailQuery,
   ListingPage,
   ListingsQuery,
+  QueryStats,
+  Shop,
 } from './types'
 
 const API_BASE = '/api'
-const API_KEY_HEADER = 'X-Api-Key'
 
 export async function getHealth(): Promise<Health> {
   return request('/v1/health')
+}
+
+export async function getCurrentUser(): Promise<UserResponse> {
+  return request('/v1/user')
 }
 
 export async function getListings(query: ListingsQuery = {}): Promise<ListingPage> {
@@ -21,6 +28,16 @@ export async function getListings(query: ListingsQuery = {}): Promise<ListingPag
     maxDaysToTop: query.maxDaysToTop,
     minScore: query.minScore,
     q: query.q,
+    shopId: query.shopId,
+    preset: query.preset,
+    bestseller: query.bestseller,
+  })}`)
+}
+
+export async function getFavorites(query: Pick<ListingsQuery, 'page' | 'size'> = {}): Promise<ListingPage> {
+  return request(`/v1/favorites${toQuery({
+    page: query.page,
+    size: query.size,
   })}`)
 }
 
@@ -34,20 +51,53 @@ export async function getListing(
   })}`)
 }
 
-async function request<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, { headers: apiHeaders() })
+export async function setListingFavorite(listingId: number, favorite: boolean): Promise<void> {
+  await request(`/v1/listings/${listingId}/favorite`, false, {
+    method: favorite ? 'PUT' : 'DELETE',
+  })
+}
+
+export async function getShop(shopId: number): Promise<Shop> {
+  return request(`/v1/shops/${shopId}`)
+}
+
+export async function getQueryStats(): Promise<QueryStats[]> {
+  return request('/v1/query-stats')
+}
+
+async function request<T>(path: string, isRetry = false, init: RequestInit = {}): Promise<T> {
+  const url = `${API_BASE}${path}`
+  const response = await fetch(url, {
+    credentials: 'include',
+    ...init,
+    headers: {
+      ...apiHeaders(),
+      ...(init.headers ?? {}),
+    },
+  })
+  if (response.status === 401 && !isRetry && !authHelper.shouldSkipRefresh(url)) {
+    const token = await authHelper.refreshAccessToken()
+    if (token) {
+      return request<T>(path, true, init)
+    }
+    authHelper.clearAuthAndRedirect()
+  }
   if (!response.ok) {
     throw await ApiError.fromResponse(response)
+  }
+  if (response.status === 204) {
+    return undefined as T
   }
   return (await response.json()) as T
 }
 
 export function apiHeaders(): HeadersInit {
-  const apiKey = import.meta.env.VITE_API_KEY
-  if (typeof apiKey === 'string' && apiKey.length > 0) {
-    return { [API_KEY_HEADER]: apiKey }
+  const headers: Record<string, string> = { Accept: 'application/json' }
+  const auth = authHelper.getAuth()
+  if (auth?.token) {
+    headers.Authorization = `Bearer ${auth.token}`
   }
-  return {}
+  return headers
 }
 
 function toQuery(params: Record<string, string | number | boolean | undefined>): string {

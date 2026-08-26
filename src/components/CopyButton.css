@@ -1,0 +1,21 @@
+.copy-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  opacity: 1;
+  color: var(--ink);
+}

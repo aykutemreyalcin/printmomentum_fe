@@ -40,6 +40,8 @@ export function useListing(listingId: number) {
     error: result.error,
     notFound: !valid || (result.key === requestKey && result.notFound),
     loading: valid && result.key !== requestKey,
+    setListing: (listing: ListingDetail) =>
+      setResult((current) => ({ ...current, listing, error: null, notFound: false })),
   }
 }
 

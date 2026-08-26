@@ -34,6 +34,10 @@ describe('ListingDetailPage', () => {
     expect(etsy).toHaveAttribute('href', 'https://www.etsy.com/listing/9101')
     expect(etsy).toHaveAttribute('target', '_blank')
     expect(etsy).toHaveAttribute('rel', 'noreferrer')
+    expect(screen.getByRole('button', { name: 'Copy all tags' })).toBeInTheDocument()
+    expect(screen.getByText('Entered our top-N in 2.0 days.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Rank 3 for “graphic tee”/ })).toBeInTheDocument()
+    expect(screen.getByText('Listed')).toBeInTheDocument()
   })
 
   it('shows a 404 message when the listing is missing', async () => {
