@@ -1,4 +1,5 @@
 import type { PropsWithChildren, ReactElement } from 'react'
+import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { AuthProvider } from '../auth/AuthProvider'
 import { CompareProvider } from '../compare/CompareProvider'
@@ -32,8 +33,6 @@ export function TestProviders({
 }
 
 export function renderWithProviders(ui: ReactElement, route = '/') {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { render } = require('@testing-library/react') as typeof import('@testing-library/react')
   return render(ui, {
     wrapper: ({ children }) => <TestProviders route={route}>{children}</TestProviders>,
   })

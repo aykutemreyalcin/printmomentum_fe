@@ -9,7 +9,6 @@ import {
   formatAgeDays,
   formatCount,
   formatDays,
-  formatDelta,
   formatMoney,
   formatScore,
 } from '../lib/format'
@@ -98,8 +97,8 @@ export function ComparePage() {
               {ROWS.map((key) => (
                 <tr key={key}>
                   <th title={rowHint(key, left, glossary)}>{rowLabel(key, t)}</th>
-                  <td className="numeric">{rowValue(key, left, t)}</td>
-                  <td className="numeric">{rowValue(key, right, t)}</td>
+                  <td className="numeric">{rowValue(key, left)}</td>
+                  <td className="numeric">{rowValue(key, right)}</td>
                 </tr>
               ))}
             </tbody>
@@ -141,7 +140,7 @@ function rowLabel(key: (typeof ROWS)[number], t: ReturnType<typeof useI18n>['t']
   return t(map[key])
 }
 
-function rowValue(key: (typeof ROWS)[number], listing: ListingDetail, t: ReturnType<typeof useI18n>['t']) {
+function rowValue(key: (typeof ROWS)[number], listing: ListingDetail) {
   switch (key) {
     case 'price':
       return formatMoney(listing.price, listing.currency)
