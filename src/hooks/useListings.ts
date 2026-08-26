@@ -1,11 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ApiError } from '../api/ApiError'
 import { getFavorites, getListings, setListingFavorite } from '../api/client'
 import { sampleDataEnabled, sampleListingPage } from '../api/sampleListings'
 import type { ListingFeedItem, ListingPage, ListingsQuery } from '../api/types'
 import { useFavoritesCount } from '../favorites/FavoritesCountProvider'
 
-export function useListings(query: ListingsQuery = {}, source: 'feed' | 'favorites' = 'feed') {
+const DEFAULT_PAGE_SIZE = 50
+
+export function useListings(
+  query: ListingsQuery = {},
+  source: 'feed' | 'favorites' = 'feed',
+  pagination: { pageIndex: number; pageSize: number } = { pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE },
+) {
   const { bump } = useFavoritesCount()
   const maxDaysToTop = query.maxDaysToTop
   const minScore = query.minScore
@@ -13,8 +19,10 @@ export function useListings(query: ListingsQuery = {}, source: 'feed' | 'favorit
   const preset = query.preset
   const shopId = query.shopId
   const bestseller = query.bestseller
+  const pageIndex = pagination.pageIndex
+  const pageSize = pagination.pageSize
   const [attempt, setAttempt] = useState(0)
-  const requestKey = `${source}|${maxDaysToTop ?? ''}|${minScore ?? ''}|${q ?? ''}|${preset ?? ''}|${shopId ?? ''}|${bestseller ? '1' : ''}|${attempt}`
+  const requestKey = `${source}|${maxDaysToTop ?? ''}|${minScore ?? ''}|${q ?? ''}|${preset ?? ''}|${shopId ?? ''}|${bestseller ? '1' : ''}|${pageIndex}|${pageSize}|${attempt}`
   const [result, setResult] = useState<FeedResult>({
     key: '',
     page: null,
@@ -24,9 +32,19 @@ export function useListings(query: ListingsQuery = {}, source: 'feed' | 'favorit
 
   useEffect(() => {
     let cancelled = false
-    const load = source === 'favorites'
-      ? getFavorites({ page: 0, size: 100 })
-      : getListings({ maxDaysToTop, minScore, q, preset, shopId, bestseller, page: 0, size: 100 })
+    const load =
+      source === 'favorites'
+        ? getFavorites({ page: pageIndex, size: pageSize })
+        : getListings({
+            maxDaysToTop,
+            minScore,
+            q,
+            preset,
+            shopId,
+            bestseller,
+            page: pageIndex,
+            size: pageSize,
+          })
     load
       .then((page) => {
         if (cancelled) return
@@ -53,15 +71,22 @@ export function useListings(query: ListingsQuery = {}, source: 'feed' | 'favorit
     return () => {
       cancelled = true
     }
-  }, [source, maxDaysToTop, minScore, q, preset, shopId, bestseller, attempt, requestKey])
+  }, [
+    source,
+    maxDaysToTop,
+    minScore,
+    q,
+    preset,
+    shopId,
+    bestseller,
+    pageIndex,
+    pageSize,
+    attempt,
+    requestKey,
+  ])
 
-  return {
-    page: result.page,
-    error: result.error,
-    sample: result.sample,
-    loading: result.key !== requestKey,
-    retry: () => setAttempt((current) => current + 1),
-    toggleFavorite: async (listing: ListingFeedItem) => {
+  const toggleFavorite = useCallback(
+    async (listing: ListingFeedItem) => {
       const next = !listing.favorite
       await setListingFavorite(listing.listingId, next)
       bump(next ? 1 : -1)
@@ -72,10 +97,24 @@ export function useListings(query: ListingsQuery = {}, source: 'feed' | 'favorit
           .filter((item) => source !== 'favorites' || item.favorite)
         return {
           ...current,
-          page: { ...current.page, items, total: source === 'favorites' ? items.length : current.page.total },
+          page: {
+            ...current.page,
+            items,
+            total: source === 'favorites' ? items.length : current.page.total,
+          },
         }
       })
     },
+    [bump, source],
+  )
+
+  return {
+    page: result.page,
+    error: result.error,
+    sample: result.sample,
+    loading: result.key !== requestKey,
+    retry: () => setAttempt((current) => current + 1),
+    toggleFavorite,
   }
 }
 

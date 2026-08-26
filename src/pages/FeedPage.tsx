@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FeedFilters } from '../components/FeedFilters'
-import { ListingFeedTable } from '../components/ListingFeedTable'
-import { QueryStatsStrip } from '../components/QueryStatsStrip'
+import { ListingFeedTable, loadFeedPageSize } from '../components/ListingFeedTable'
 import { getHealth } from '../api/client'
 import type { Health } from '../api/types'
 import { useFeedFilters } from '../hooks/useFeedFilters'
@@ -16,7 +15,20 @@ export function FeedPage() {
   usePageTitle('title.feed')
   const { t } = useI18n()
   const filters = useFeedFilters()
-  const { page, error, loading, sample, retry, toggleFavorite } = useListings(filters.query)
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: loadFeedPageSize() })
+  const filterKey = useMemo(
+    () =>
+      `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}`,
+    [filters.maxDaysToTop, filters.minScore, filters.q, filters.preset, filters.bestseller],
+  )
+  useEffect(() => {
+    setPagination((current) => ({ ...current, pageIndex: 0 }))
+  }, [filterKey])
+  const { page, error, loading, sample, retry, toggleFavorite } = useListings(
+    filters.query,
+    'feed',
+    pagination,
+  )
   const items = page?.items ?? []
   const [health, setHealth] = useState<Health | null>(null)
 
@@ -73,8 +85,6 @@ export function FeedPage() {
         </button>
       </div>
 
-      <QueryStatsStrip selectedQuery={filters.q} onSelect={filters.setQ} />
-
       <FeedFilters
         maxDaysToTop={filters.maxDaysToTop}
         minScore={filters.minScore}
@@ -88,6 +98,10 @@ export function FeedPage() {
 
       <ListingFeedTable
         items={items}
+        rowCount={page?.total ?? 0}
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
+        onPaginationChange={setPagination}
         loading={loading}
         error={error}
         onRetry={retry}

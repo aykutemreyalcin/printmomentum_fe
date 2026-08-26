@@ -203,27 +203,4 @@ describe('FeedPage', () => {
     expect(await screen.findByRole('button', { name: 'Remove from favorites' })).toBeInTheDocument()
   })
 
-  it('filters the feed when a competition query is selected', async () => {
-    stubApi({
-      items: [],
-      queryStats: [
-        {
-          query: 'teacher shirt',
-          observedDay: '2026-08-26',
-          listingCount: 8,
-          etsyCount: 4200,
-          medianPrice: 26.5,
-        },
-      ],
-    })
-    const user = userEvent.setup()
-
-    renderWithApp(<FeedPage />)
-
-    await user.click(await screen.findByRole('button', { name: /teacher shirt/i }))
-
-    await waitFor(() => {
-      expect(vi.mocked(fetch).mock.calls.some((call) => String(call[0]).includes('q=teacher+shirt'))).toBe(true)
-    })
-  })
 })
