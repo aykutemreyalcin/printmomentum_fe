@@ -1,4 +1,5 @@
 import { expect, vi } from 'vitest'
+import type { UserResponse } from '../auth/_models'
 import { AUTH_LOCAL_STORAGE_KEY } from '../auth/_helpers'
 
 export const healthBody = { status: 'ok', service: 'printmomentum-be' }
@@ -9,6 +10,15 @@ export const userBody = {
   displayName: 'User',
   email: 'user@printmomentum.local',
   role: 'user' as const,
+  active: true,
+}
+
+export const adminBody = {
+  id: 1,
+  name: 'Admin',
+  displayName: 'Admin',
+  email: 'admin@printmomentum.local',
+  role: 'admin' as const,
   active: true,
 }
 
@@ -64,6 +74,9 @@ export function stubApi(
     detail?: unknown
     shop?: unknown
     queryStats?: unknown[]
+    user?: UserResponse
+    registerStatus?: number
+    changePasswordStatus?: number
     ok?: boolean
     status?: number
     detailOk?: boolean
@@ -81,10 +94,33 @@ export function stubApi(
   const shopStatus = options.shopStatus ?? (shopOk ? 200 : 404)
   vi.stubGlobal(
     'fetch',
-    vi.fn(async (input: RequestInfo | URL) => {
+    vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input)
+      const method = (init?.method ?? 'GET').toUpperCase()
+      if (url.includes('/v1/user/register')) {
+        const registerStatus = options.registerStatus ?? 200
+        return {
+          ok: registerStatus >= 200 && registerStatus < 300,
+          status: registerStatus,
+          json: async () =>
+            registerStatus >= 200 && registerStatus < 300
+              ? 3
+              : { title: 'Forbidden', status: registerStatus, detail: 'You do not have permission to access this resource.' },
+        }
+      }
+      if (url.includes('/v1/user') && method === 'PATCH') {
+        const changePasswordStatus = options.changePasswordStatus ?? 202
+        return {
+          ok: changePasswordStatus >= 200 && changePasswordStatus < 300,
+          status: changePasswordStatus,
+          json: async () =>
+            changePasswordStatus >= 200 && changePasswordStatus < 300
+              ? {}
+              : { title: 'Not Acceptable', status: changePasswordStatus, detail: 'Wrong password' },
+        }
+      }
       if (url.includes('/v1/user')) {
-        return { ok: true, status: 200, json: async () => userBody }
+        return { ok: true, status: 200, json: async () => options.user ?? userBody }
       }
       if (url.includes('/v2/auth/login')) {
         return {

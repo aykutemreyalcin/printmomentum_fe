@@ -21,6 +21,32 @@ export async function getCurrentUser(): Promise<UserResponse> {
   return request('/v1/user')
 }
 
+export async function changePassword(body: {
+  currentPassword: string
+  newPassword: string
+  confirmationPassword: string
+}): Promise<void> {
+  await request('/v1/user', false, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
+export async function registerUser(body: {
+  email: string
+  password: string
+  name: string
+  displayName?: string
+  role: 'admin' | 'user'
+}): Promise<number> {
+  return request('/v1/user/register', false, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
 export async function getListings(query: ListingsQuery = {}): Promise<ListingPage> {
   return request(`/v1/listings${toQuery({
     page: query.page,
@@ -85,7 +111,7 @@ async function request<T>(path: string, isRetry = false, init: RequestInit = {})
   if (!response.ok) {
     throw await ApiError.fromResponse(response)
   }
-  if (response.status === 204) {
+  if (response.status === 204 || response.status === 202) {
     return undefined as T
   }
   return (await response.json()) as T

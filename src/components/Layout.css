@@ -34,25 +34,67 @@
   gap: 14px;
 }
 
-.shell-email {
-  max-width: 220px;
+.shell-profile {
+  position: relative;
+}
+
+.shell-profile-toggle {
+  max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.shell-logout {
   border: 0;
   background: transparent;
-  padding: 0;
+  padding: 6px 0;
   cursor: pointer;
-  color: var(--muted);
+  font: 600 13px/1 var(--sans);
+  color: var(--ink);
 }
 
-.shell-logout:hover {
+.shell-profile-toggle:hover,
+.shell-profile-toggle[aria-expanded='true'] {
+  color: var(--primary);
+}
+
+.shell-profile-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  width: 220px;
+  padding: 10px 0 8px;
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  background: var(--surface);
+  display: grid;
+}
+
+.shell-profile-email {
+  padding: 4px 14px 10px;
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shell-profile-menu a,
+.shell-profile-logout {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 9px 14px;
+  font: 600 13px/1.2 var(--sans);
   color: var(--ink);
+  cursor: pointer;
+}
+
+.shell-profile-menu a:hover,
+.shell-profile-logout:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .shell-head .api-status {
@@ -97,8 +139,7 @@
 }
 
 @media (max-width: 700px) {
-  .shell-tagline,
-  .shell-email {
+  .shell-tagline {
     display: none;
   }
 

@@ -1,6 +1,9 @@
 import { Route, Routes } from 'react-router'
+import { RequireAdmin } from './auth/RequireAdmin'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
+import { ChangePasswordPage } from './pages/ChangePasswordPage'
+import { CreateUserPage } from './pages/CreateUserPage'
 import { FavoritesPage } from './pages/FavoritesPage'
 import { FeedPage } from './pages/FeedPage'
 import { ListingDetailPage } from './pages/ListingDetailPage'
@@ -18,6 +21,10 @@ export function AppRoutes() {
           <Route path="favorites" element={<FavoritesPage />} />
           <Route path="listings/:listingId" element={<ListingDetailPage />} />
           <Route path="shops/:shopId" element={<ShopPage />} />
+          <Route path="account/security/change-password" element={<ChangePasswordPage />} />
+          <Route element={<RequireAdmin />}>
+            <Route path="account/members/register-user" element={<CreateUserPage />} />
+          </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>

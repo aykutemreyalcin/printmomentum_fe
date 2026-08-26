@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from './AppRoutes'
 import { AuthProvider } from './auth/AuthProvider'
-import { seedAuth, stubApi } from './test/stubApi'
+import { seedAuth, stubApi, adminBody } from './test/stubApi'
 import { AppTheme } from './theme/AppTheme'
 
 const renderAt = (path: string) =>
@@ -67,5 +67,31 @@ describe('AppRoutes', () => {
     renderAt('/nope')
 
     expect(await screen.findByText('Error 404')).toBeInTheDocument()
+  })
+
+  it('opens change password from the profile menu', async () => {
+    renderAt('/')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'User' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Change Password' }))
+
+    expect(await screen.findByRole('heading', { name: 'Change Password' })).toBeInTheDocument()
+  })
+
+  it('hides create-user from a regular user and redirects the route', async () => {
+    renderAt('/account/members/register-user')
+
+    expect(await screen.findByRole('heading', { name: 'Feed' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Create User' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Register New User' })).not.toBeInTheDocument()
+  })
+
+  it('lets admin open the create-user page from the nav', async () => {
+    stubApi({ items: [], user: adminBody })
+    renderAt('/')
+
+    await userEvent.click(await screen.findByRole('link', { name: 'Create User' }))
+
+    expect(await screen.findByRole('heading', { name: 'Register New User' })).toBeInTheDocument()
   })
 })
