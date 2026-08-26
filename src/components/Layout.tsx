@@ -1,13 +1,19 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../auth/AuthProvider'
+import { useFavoritesCount } from '../favorites/FavoritesCountProvider'
+import { useI18n } from '../i18n/I18nProvider'
 import { ApiStatus } from './ApiStatus'
+import { CompareBar } from './CompareBar'
+import { ShellControls } from './ShellControls'
 import './Layout.css'
 
 export function Layout() {
   const { currentUser, logout } = useAuth()
+  const { count: favoritesCount } = useFavoritesCount()
+  const { t } = useI18n()
   const isAdmin = currentUser?.role === 'admin'
-  const profileLabel = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Account'
+  const profileLabel = currentUser?.displayName || currentUser?.name || currentUser?.email || t('auth.account')
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -26,10 +32,14 @@ export function Layout() {
     <div className="shell">
       <header className="shell-head">
         <h1 className="shell-mark">
-          <Link to="/">PrintMomentum</Link>
+          <Link to="/" className="shell-brand">
+            <img src="/pm-logo.png" alt="" width={28} height={28} className="shell-logo" />
+            PrintMomentum
+          </Link>
         </h1>
-        <p className="label shell-tagline">Print-tee index</p>
+        <p className="label shell-tagline">{t('brand.tagline')}</p>
         <ApiStatus />
+        <ShellControls />
         <div className="shell-session" ref={menuRef}>
           {currentUser && (
             <div className="shell-profile">
@@ -45,20 +55,19 @@ export function Layout() {
               {menuOpen && (
                 <div className="shell-profile-menu" role="menu">
                   <p className="shell-profile-email">{currentUser.email}</p>
+                  <Link to="/account/profile" role="menuitem" onClick={() => setMenuOpen(false)}>
+                    {t('menu.account')}
+                  </Link>
                   <Link
                     to="/account/security/change-password"
                     role="menuitem"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Change Password
+                    {t('menu.password')}
                   </Link>
                   {isAdmin && (
-                    <Link
-                      to="/account/members/register-user"
-                      role="menuitem"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      Create User
+                    <Link to="/account/members" role="menuitem" onClick={() => setMenuOpen(false)}>
+                      {t('menu.members')}
                     </Link>
                   )}
                   <button
@@ -70,7 +79,7 @@ export function Layout() {
                       void logout()
                     }}
                   >
-                    Logout
+                    {t('menu.logout')}
                   </button>
                 </div>
               )}
@@ -79,13 +88,22 @@ export function Layout() {
         </div>
       </header>
 
-      <nav className="shell-nav" aria-label="Primary">
+      <nav className="shell-nav" aria-label={t('nav.primary')}>
         <NavLink to="/" end>
-          Feed
+          {t('nav.feed')}
         </NavLink>
-        <NavLink to="/favorites">Favorites</NavLink>
-        {isAdmin && <NavLink to="/account/members/register-user">Create User</NavLink>}
+        <NavLink to="/favorites" className="shell-nav-favorites">
+          {t('nav.favorites')}
+          {favoritesCount != null && favoritesCount > 0 ? (
+            <span className="shell-nav-badge" aria-label={String(favoritesCount)}>
+              {favoritesCount}
+            </span>
+          ) : null}
+        </NavLink>
+        {isAdmin && <NavLink to="/account/members">{t('nav.members')}</NavLink>}
       </nav>
+
+      <CompareBar />
 
       <main className="shell-main">
         <Outlet />

@@ -1,16 +1,16 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ListingDetailPage } from './ListingDetailPage'
 import { detailFixture, stubApi } from '../test/stubApi'
+import { renderWithApp } from '../test/renderWithApp'
 
 function renderDetail(path: string) {
-  return render(
-    <MemoryRouter initialEntries={[path]}>
-      <Routes>
-        <Route path="/listings/:listingId" element={<ListingDetailPage />} />
-      </Routes>
-    </MemoryRouter>,
+  return renderWithApp(
+    <Routes>
+      <Route path="/listings/:listingId" element={<ListingDetailPage />} />
+    </Routes>,
+    path,
   )
 }
 
@@ -37,7 +37,7 @@ describe('ListingDetailPage', () => {
     expect(screen.getByRole('button', { name: 'Copy all tags' })).toBeInTheDocument()
     expect(screen.getByText('Entered our top-N in 2.0 days.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Rank 3 for “graphic tee”/ })).toBeInTheDocument()
-    expect(screen.getByText('Listed')).toBeInTheDocument()
+    expect(screen.getByText('Listed —')).toBeInTheDocument()
   })
 
   it('shows a 404 message when the listing is missing', async () => {

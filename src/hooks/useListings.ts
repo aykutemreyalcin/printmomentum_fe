@@ -3,8 +3,10 @@ import { ApiError } from '../api/ApiError'
 import { getFavorites, getListings, setListingFavorite } from '../api/client'
 import { sampleDataEnabled, sampleListingPage } from '../api/sampleListings'
 import type { ListingFeedItem, ListingPage, ListingsQuery } from '../api/types'
+import { useFavoritesCount } from '../favorites/FavoritesCountProvider'
 
 export function useListings(query: ListingsQuery = {}, source: 'feed' | 'favorites' = 'feed') {
+  const { bump } = useFavoritesCount()
   const maxDaysToTop = query.maxDaysToTop
   const minScore = query.minScore
   const q = query.q
@@ -62,6 +64,7 @@ export function useListings(query: ListingsQuery = {}, source: 'feed' | 'favorit
     toggleFavorite: async (listing: ListingFeedItem) => {
       const next = !listing.favorite
       await setListingFavorite(listing.listingId, next)
+      bump(next ? 1 : -1)
       setResult((current) => {
         if (!current.page) return current
         const items = current.page.items

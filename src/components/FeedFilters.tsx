@@ -1,12 +1,14 @@
 import type { FeedPreset } from '../api/types'
+import { useI18n } from '../i18n/I18nProvider'
+import type { MessageKey } from '../i18n/messages'
 import './FeedFilters.css'
 
-const PRESETS: { id: FeedPreset; label: string }[] = [
-  { id: 'seen-today', label: 'Seen today' },
-  { id: 'created-today', label: 'Opened today' },
-  { id: 'created-7d', label: 'Opened in 7d' },
-  { id: 'reviewed-24h', label: 'New review' },
-  { id: 'climbing', label: 'Climbing' },
+const PRESETS: { id: FeedPreset; key: MessageKey }[] = [
+  { id: 'seen-today', key: 'filters.seenToday' },
+  { id: 'created-today', key: 'filters.openedToday' },
+  { id: 'created-7d', key: 'filters.opened7d' },
+  { id: 'reviewed-24h', key: 'filters.newReview' },
+  { id: 'climbing', key: 'filters.climbing' },
 ]
 
 type Props = {
@@ -30,9 +32,11 @@ export function FeedFilters({
   onPreset,
   onBestseller,
 }: Props) {
+  const { t } = useI18n()
+
   return (
     <form className="feed-filters" onSubmit={(event) => event.preventDefault()}>
-      <div className="feed-presets" role="group" aria-label="Presets">
+      <div className="feed-presets" role="group" aria-label={t('filters.presets')}>
         {PRESETS.map((item) => (
           <button
             key={item.id}
@@ -41,22 +45,22 @@ export function FeedFilters({
             aria-pressed={preset === item.id}
             onClick={() => onPreset(preset === item.id ? '' : item.id)}
           >
-            {item.label}
+            {t(item.key)}
           </button>
         ))}
       </div>
-      <div className="feed-presets feed-bestseller-filter" role="group" aria-label="Bestseller">
+      <div className="feed-presets feed-bestseller-filter" role="group" aria-label={t('filters.bestseller')}>
         <button
           type="button"
           className={['feed-preset', bestseller && 'is-on'].filter(Boolean).join(' ')}
           aria-pressed={bestseller}
           onClick={() => onBestseller(!bestseller)}
         >
-          Bestsellers only
+          {t('filters.bestsellersOnly')}
         </button>
       </div>
       <label>
-        <span className="label">Max days to top</span>
+        <span className="label">{t('filters.maxDays')}</span>
         <input
           type="number"
           min={0}
@@ -67,7 +71,7 @@ export function FeedFilters({
         />
       </label>
       <label>
-        <span className="label">Min score</span>
+        <span className="label">{t('filters.minScore')}</span>
         <input
           type="number"
           min={0}

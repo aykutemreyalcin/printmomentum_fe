@@ -1,10 +1,10 @@
-import { AuthProvider } from '../auth/AuthProvider'
 import { CreateUserPage } from './CreateUserPage'
+import { MembersPage } from './MembersPage'
 import { adminBody, seedAuth, stubApi } from '../test/stubApi'
-import { AppTheme } from '../theme/AppTheme'
-import { render, screen } from '@testing-library/react'
+import { renderWithApp } from '../test/renderWithApp'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
+import { Route, Routes } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 describe('CreateUserPage', () => {
@@ -13,19 +13,17 @@ describe('CreateUserPage', () => {
     vi.unstubAllGlobals()
   })
 
-  it('registers a user as admin', async () => {
+  it('registers a user as admin and returns to members', async () => {
     seedAuth()
     stubApi({ user: adminBody })
     const user = userEvent.setup()
 
-    render(
-      <AppTheme>
-        <AuthProvider>
-          <MemoryRouter>
-            <CreateUserPage />
-          </MemoryRouter>
-        </AuthProvider>
-      </AppTheme>,
+    renderWithApp(
+      <Routes>
+        <Route path="/account/members/register-user" element={<CreateUserPage />} />
+        <Route path="/account/members" element={<MembersPage />} />
+      </Routes>,
+      '/account/members/register-user',
     )
 
     await user.type(screen.getByLabelText(/Display Name/), 'Fresh')
@@ -34,6 +32,7 @@ describe('CreateUserPage', () => {
     await user.type(screen.getByLabelText(/Confirm Password/), 'Secret1')
     await user.click(screen.getByRole('button', { name: 'Register User' }))
 
+    expect(await screen.findByRole('heading', { name: 'Accounts' })).toBeInTheDocument()
     expect(await screen.findByRole('status')).toHaveTextContent('User registered successfully')
   })
 })

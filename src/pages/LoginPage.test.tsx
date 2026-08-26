@@ -1,10 +1,8 @@
-import { AuthProvider } from '../auth/AuthProvider'
 import { LoginPage } from './LoginPage'
 import { stubApi } from '../test/stubApi'
-import { AppTheme } from '../theme/AppTheme'
-import { render, screen } from '@testing-library/react'
+import { renderWithApp } from '../test/renderWithApp'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 describe('LoginPage', () => {
@@ -17,15 +15,7 @@ describe('LoginPage', () => {
     stubApi()
     const user = userEvent.setup()
 
-    render(
-      <AppTheme>
-        <AuthProvider>
-          <MemoryRouter>
-            <LoginPage />
-          </MemoryRouter>
-        </AuthProvider>
-      </AppTheme>,
-    )
+    renderWithApp(<LoginPage />)
 
     await user.type(screen.getByLabelText('Email'), 'user@printmomentum.local')
     await user.type(screen.getByLabelText('Password'), 'User123!')

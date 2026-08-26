@@ -1,22 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from './AppRoutes'
-import { AuthProvider } from './auth/AuthProvider'
 import { seedAuth, stubApi, adminBody } from './test/stubApi'
-import { AppTheme } from './theme/AppTheme'
-
-const renderAt = (path: string) =>
-  render(
-    <AppTheme>
-      <AuthProvider>
-        <MemoryRouter initialEntries={[path]}>
-          <AppRoutes />
-        </MemoryRouter>
-      </AuthProvider>
-    </AppTheme>,
-  )
+import { renderWithApp } from './test/renderWithApp'
 
 describe('AppRoutes', () => {
   beforeEach(() => {
@@ -30,33 +17,33 @@ describe('AppRoutes', () => {
   })
 
   it('renders the PrintMomentum heading on the feed route', async () => {
-    renderAt('/')
+    renderWithApp(<AppRoutes />, '/')
 
     expect(await screen.findByRole('heading', { name: 'PrintMomentum' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Feed' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Favorites' })).toHaveAttribute('href', '/favorites')
+    expect(screen.getByRole('link', { name: /Favorites/i })).toHaveAttribute('href', '/favorites')
   })
 
   it('renders the favorites route', async () => {
-    renderAt('/favorites')
+    renderWithApp(<AppRoutes />, '/favorites')
 
     expect(await screen.findByRole('heading', { name: 'Favorites' })).toBeInTheDocument()
   })
 
   it('renders the listing detail route for an id', async () => {
-    renderAt('/listings/1147645830')
+    renderWithApp(<AppRoutes />, '/listings/1147645830')
 
     expect(await screen.findByRole('heading', { name: 'Graphic DTG Print Tee' })).toBeInTheDocument()
   })
 
   it('renders the shop route for an id', async () => {
-    renderAt('/shops/9101')
+    renderWithApp(<AppRoutes />, '/shops/9101')
 
     expect(await screen.findByRole('heading', { name: 'Shop High' })).toBeInTheDocument()
   })
 
   it('navigates from detail back to the feed', async () => {
-    renderAt('/listings/1147645830')
+    renderWithApp(<AppRoutes />, '/listings/1147645830')
 
     await userEvent.click(await screen.findByRole('link', { name: /back to feed/i }))
 
@@ -64,13 +51,13 @@ describe('AppRoutes', () => {
   })
 
   it('shows a not found page for unknown routes', async () => {
-    renderAt('/nope')
+    renderWithApp(<AppRoutes />, '/nope')
 
     expect(await screen.findByText('Error 404')).toBeInTheDocument()
   })
 
   it('opens change password from the profile menu', async () => {
-    renderAt('/')
+    renderWithApp(<AppRoutes />, '/')
 
     await userEvent.click(await screen.findByRole('button', { name: 'User' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Change Password' }))
@@ -78,20 +65,31 @@ describe('AppRoutes', () => {
     expect(await screen.findByRole('heading', { name: 'Change Password' })).toBeInTheDocument()
   })
 
-  it('hides create-user from a regular user and redirects the route', async () => {
-    renderAt('/account/members/register-user')
+  it('hides members from a regular user and redirects the route', async () => {
+    renderWithApp(<AppRoutes />, '/account/members/register-user')
 
     expect(await screen.findByRole('heading', { name: 'Feed' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Create User' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Members' })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Register New User' })).not.toBeInTheDocument()
   })
 
-  it('lets admin open the create-user page from the nav', async () => {
+  it('lets admin open members then create-user', async () => {
     stubApi({ items: [], user: adminBody })
-    renderAt('/')
+    renderWithApp(<AppRoutes />, '/')
 
-    await userEvent.click(await screen.findByRole('link', { name: 'Create User' }))
+    await userEvent.click(await screen.findByRole('link', { name: 'Members' }))
 
+    expect(await screen.findByRole('heading', { name: 'Accounts' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('link', { name: 'Create user' }))
     expect(await screen.findByRole('heading', { name: 'Register New User' })).toBeInTheDocument()
+  })
+
+  it('opens account from the profile menu', async () => {
+    renderWithApp(<AppRoutes />, '/')
+
+    await userEvent.click(await screen.findByRole('button', { name: 'User' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Account' }))
+
+    expect(await screen.findByRole('heading', { name: 'Account' })).toBeInTheDocument()
   })
 })

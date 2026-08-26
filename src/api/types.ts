@@ -1,6 +1,14 @@
 export type Health = {
   status: string
   service: string
+  indexedListings?: number
+  lastCrawlAt?: string | null
+  lastAttemptAt?: string | null
+  nextCrawlAt?: string | null
+  lastOutcome?: string | null
+  lastStored?: number | null
+  lastSkipped?: number | null
+  lastError?: string | null
 }
 
 export type ListingFeedItem = {

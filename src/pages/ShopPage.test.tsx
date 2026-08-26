@@ -1,19 +1,16 @@
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { screen } from '@testing-library/react'
+import { Route, Routes } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ShopPage } from './ShopPage'
 import { listingFixture, stubApi } from '../test/stubApi'
-import { AppTheme } from '../theme/AppTheme'
+import { renderWithApp } from '../test/renderWithApp'
 
 function renderShop(path: string) {
-  return render(
-    <AppTheme>
-      <MemoryRouter initialEntries={[path]}>
-        <Routes>
-          <Route path="/shops/:shopId" element={<ShopPage />} />
-        </Routes>
-      </MemoryRouter>
-    </AppTheme>,
+  return renderWithApp(
+    <Routes>
+      <Route path="/shops/:shopId" element={<ShopPage />} />
+    </Routes>,
+    path,
   )
 }
 

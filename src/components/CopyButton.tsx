@@ -1,6 +1,7 @@
 import Check from '@mui/icons-material/Check'
 import ContentCopy from '@mui/icons-material/ContentCopy'
 import { useState, type MouseEvent } from 'react'
+import { useI18n } from '../i18n/I18nProvider'
 import './CopyButton.css'
 
 type Props = {
@@ -8,7 +9,9 @@ type Props = {
   label?: string
 }
 
-export function CopyButton({ text, label = 'Copy' }: Props) {
+export function CopyButton({ text, label }: Props) {
+  const { t } = useI18n()
+  const resolvedLabel = label ?? t('copy.label')
   const [copied, setCopied] = useState(false)
 
   async function onCopy(event: MouseEvent<HTMLButtonElement>) {
@@ -28,8 +31,8 @@ export function CopyButton({ text, label = 'Copy' }: Props) {
       type="button"
       className="copy-btn"
       onClick={(event) => void onCopy(event)}
-      aria-label={copied ? 'Copied' : label}
-      title={copied ? 'Copied' : 'Copy to clipboard'}
+      aria-label={copied ? t('copy.copied') : resolvedLabel}
+      title={copied ? t('copy.copied') : t('copy.clipboard')}
     >
       {copied ? <Check fontSize="inherit" /> : <ContentCopy fontSize="inherit" />}
     </button>

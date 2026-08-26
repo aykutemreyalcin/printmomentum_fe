@@ -1,16 +1,21 @@
 import { Link, useParams } from 'react-router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ListingFeedTable } from '../components/ListingFeedTable'
+import { MetricTip } from '../components/MetricTip'
 import { useListings } from '../hooks/useListings'
 import { useShop } from '../hooks/useShop'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { useI18n } from '../i18n/I18nProvider'
 import { formatAgeDays, formatCount, formatScore } from '../lib/format'
 import './ShopPage.css'
 
 export function ShopPage() {
+  const { t } = useI18n()
   const shopId = Number(useParams().shopId)
   const { shop, error, notFound, loading } = useShop(shopId)
   const listings = useListings({ shopId: Number.isFinite(shopId) ? shopId : undefined, page: 0, size: 100 })
   const [search, setSearch] = useState('')
+  usePageTitle(shop?.name ? `${shop.name} · PrintMomentum` : 'title.shop')
 
   if (loading) {
     return (
@@ -26,10 +31,10 @@ export function ShopPage() {
   if (notFound) {
     return (
       <div className="shop">
-        <p className="label">Error 404</p>
-        <h2>This shop is not on the index.</h2>
+        <p className="label">{t('detail.error404')}</p>
+        <h2>{t('shop.notFound')}</h2>
         <Link to="/" className="label">
-          ← Back to feed
+          {t('shop.back')}
         </Link>
       </div>
     )
@@ -39,7 +44,7 @@ export function ShopPage() {
     return (
       <div className="shop">
         <p className="label" role="alert">
-          {error ?? 'Request failed'}
+          {error ?? t('shop.failed')}
         </p>
       </div>
     )
@@ -49,11 +54,11 @@ export function ShopPage() {
     <div className="shop">
       <div className="page-toolbar">
         <Link to="/" className="label">
-          ← Back to feed
+          {t('shop.back')}
         </Link>
         {shop.url ? (
           <a className="shop-etsy label" href={shop.url} target="_blank" rel="noreferrer">
-            View shop on Etsy
+            {t('shop.etsy')}
           </a>
         ) : null}
       </div>
@@ -61,18 +66,24 @@ export function ShopPage() {
       <section className="page-card shop-card">
         <h2>{shop.name}</h2>
         <p className="label">
-          {formatCount(shop.indexedListingCount)} indexed print tees
-          {shop.listingActiveCount != null ? ` · ${formatCount(shop.listingActiveCount)} active on Etsy` : ''}
+          {t('shop.indexed', { count: formatCount(shop.indexedListingCount) })}
+          {shop.listingActiveCount != null
+            ? ` · ${t('shop.active', { count: formatCount(shop.listingActiveCount) })}`
+            : ''}
         </p>
         <div className="shop-metrics">
-          <ShopMetric label="Lifetime sales" value={formatCount(shop.transactionSoldCount)} />
-          <ShopMetric label="Age" value={formatAgeDays(shop.ageDays)} />
-          <ShopMetric label="Rating" value={shop.reviewAverage == null ? '—' : formatScore(shop.reviewAverage)} />
-          <ShopMetric label="Reviews" value={formatCount(shop.reviewCount)} />
+          <ShopMetric label={t('shop.sales')} value={formatCount(shop.transactionSoldCount)} hint={t('shop.salesHint')} />
+          <ShopMetric label={t('shop.age')} value={formatAgeDays(shop.ageDays)} hint={t('shop.ageHint')} />
+          <ShopMetric
+            label={t('shop.rating')}
+            value={shop.reviewAverage == null ? '—' : formatScore(shop.reviewAverage)}
+            hint={t('shop.ratingHint')}
+          />
+          <ShopMetric label={t('shop.reviews')} value={formatCount(shop.reviewCount)} hint={t('shop.reviewsHint')} />
         </div>
       </section>
 
-      <h3 className="shop-climbers">Climbers in this shop</h3>
+      <h3 className="shop-climbers">{t('shop.climbers')}</h3>
       <ListingFeedTable
         items={listings.page?.items ?? []}
         loading={listings.loading}
@@ -81,17 +92,18 @@ export function ShopPage() {
         search={search}
         onSearch={setSearch}
         onToggleFavorite={listings.toggleFavorite}
-        emptyMessage="No print tees indexed for this shop yet."
+        emptyMessage={t('shop.empty')}
       />
     </div>
   )
 }
 
-function ShopMetric({ label, value }: { label: string; value: string }) {
-  return (
+function ShopMetric({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  const body = (
     <div>
       <span className="label">{label}</span>
       <p className="shop-value numeric">{value}</p>
     </div>
   )
+  return hint ? <MetricTip title={hint}>{body}</MetricTip> : body
 }

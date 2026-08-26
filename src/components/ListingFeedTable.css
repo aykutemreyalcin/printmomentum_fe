@@ -1,6 +1,8 @@
 .listing-feed-table {
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .listing-feed-table .MuiTableContainer-root {
@@ -150,6 +152,37 @@
 
 .listing-detail-links a:hover {
   color: var(--primary);
+}
+
+.listing-query-hit {
+  display: inline-block;
+  margin-right: 10px;
+  cursor: help;
+}
+
+.listing-reset-cols {
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.listing-reset-cols:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.listing-compare-check {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.feed {
+  min-width: 0;
+  max-width: 100%;
 }
 
 @media (max-width: 700px) {

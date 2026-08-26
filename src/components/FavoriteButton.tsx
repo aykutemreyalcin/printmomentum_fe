@@ -1,6 +1,7 @@
 import Favorite from '@mui/icons-material/Favorite'
 import FavoriteBorder from '@mui/icons-material/FavoriteBorder'
 import { useState, type MouseEvent } from 'react'
+import { useI18n } from '../i18n/I18nProvider'
 import './FavoriteButton.css'
 
 type Props = {
@@ -10,7 +11,9 @@ type Props = {
 }
 
 export function FavoriteButton({ favorite, onToggle, disabled }: Props) {
+  const { t } = useI18n()
   const [busy, setBusy] = useState(false)
+  const label = favorite ? t('fav.remove') : t('fav.add')
 
   async function onClick(event: MouseEvent<HTMLButtonElement>) {
     event.preventDefault()
@@ -31,8 +34,8 @@ export function FavoriteButton({ favorite, onToggle, disabled }: Props) {
       onClick={(event) => void onClick(event)}
       disabled={disabled || busy}
       aria-pressed={favorite}
-      aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
-      title={favorite ? 'Remove from favorites' : 'Add to favorites'}
+      aria-label={label}
+      title={label}
     >
       {favorite ? <Favorite fontSize="inherit" /> : <FavoriteBorder fontSize="inherit" />}
     </button>

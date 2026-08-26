@@ -1,10 +1,8 @@
-import { AuthProvider } from '../auth/AuthProvider'
 import { ChangePasswordPage } from './ChangePasswordPage'
 import { seedAuth, stubApi } from '../test/stubApi'
-import { AppTheme } from '../theme/AppTheme'
-import { render, screen } from '@testing-library/react'
+import { renderWithApp } from '../test/renderWithApp'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 describe('ChangePasswordPage', () => {
@@ -18,15 +16,7 @@ describe('ChangePasswordPage', () => {
     stubApi()
     const user = userEvent.setup()
 
-    render(
-      <AppTheme>
-        <AuthProvider>
-          <MemoryRouter>
-            <ChangePasswordPage />
-          </MemoryRouter>
-        </AuthProvider>
-      </AppTheme>,
-    )
+    renderWithApp(<ChangePasswordPage />)
 
     await user.type(screen.getByLabelText('Current Password'), 'User123!')
     await user.type(screen.getByLabelText('New Password'), 'NewPass1')
@@ -41,15 +31,7 @@ describe('ChangePasswordPage', () => {
     stubApi({ changePasswordStatus: 406 })
     const user = userEvent.setup()
 
-    render(
-      <AppTheme>
-        <AuthProvider>
-          <MemoryRouter>
-            <ChangePasswordPage />
-          </MemoryRouter>
-        </AuthProvider>
-      </AppTheme>,
-    )
+    renderWithApp(<ChangePasswordPage />)
 
     await user.type(screen.getByLabelText('Current Password'), 'wrong')
     await user.type(screen.getByLabelText('New Password'), 'NewPass1')

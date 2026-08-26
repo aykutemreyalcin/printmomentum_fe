@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { ListingFeedTable } from '../components/ListingFeedTable'
 import { useListings } from '../hooks/useListings'
-import { useState } from 'react'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { useI18n } from '../i18n/I18nProvider'
 import './FeedPage.css'
 
 export function FavoritesPage() {
+  usePageTitle('title.favorites')
+  const { t } = useI18n()
   const { page, error, loading, retry, toggleFavorite } = useListings({}, 'favorites')
   const [search, setSearch] = useState('')
   const items = page?.items ?? []
@@ -12,9 +16,9 @@ export function FavoritesPage() {
     <div className="feed">
       <div className="page-toolbar">
         <div>
-          <h2>Favorites</h2>
+          <h2>{t('favorites.title')}</h2>
           <p className="label page-meta">
-            {loading ? 'Loading favorites' : `${page?.total ?? 0} saved listings`}
+            {loading ? t('favorites.loading') : t('favorites.saved', { count: page?.total ?? 0 })}
           </p>
         </div>
       </div>
@@ -27,7 +31,7 @@ export function FavoritesPage() {
         search={search}
         onSearch={setSearch}
         onToggleFavorite={toggleFavorite}
-        emptyMessage="No favorites yet. Heart a listing in the feed to pin it here."
+        emptyMessage={t('favorites.empty')}
       />
     </div>
   )

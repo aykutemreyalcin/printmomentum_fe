@@ -1,6 +1,6 @@
 import { ApiError } from './ApiError'
 import * as authHelper from '../auth/_helpers'
-import type { UserResponse } from '../auth/_models'
+import type { UserResponse, UserSessionView } from '../auth/_models'
 import type {
   Health,
   ListingDetail,
@@ -42,6 +42,31 @@ export async function registerUser(body: {
 }): Promise<number> {
   return request('/v1/user/register', false, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
+export async function listMembers(): Promise<UserResponse[]> {
+  return request('/v1/user/members')
+}
+
+export async function listUserSessions(userId: number): Promise<UserSessionView[]> {
+  return request(`/v1/user/members/${userId}/sessions`)
+}
+
+export async function setUserActive(id: number, status: boolean): Promise<void> {
+  await request(`/v1/user/${id}?status=${status}`, false, { method: 'PATCH' })
+}
+
+export async function updateProfile(body: {
+  name: string
+  displayName?: string
+  email?: string
+  currentPassword?: string
+}): Promise<UserResponse> {
+  return request('/v1/user', false, {
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })

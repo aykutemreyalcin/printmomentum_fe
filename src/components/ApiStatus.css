@@ -15,6 +15,19 @@
   color: var(--danger);
 }
 
-.api-status.is-down .api-status-dot {
-  background: var(--danger);
+.api-status-crawl {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.api-status-crawl::before {
+  content: '·';
+  margin: 0 6px 0 2px;
+  color: var(--hair);
+}
+
+@media (max-width: 900px) {
+  .api-status-crawl {
+    display: none;
+  }
 }

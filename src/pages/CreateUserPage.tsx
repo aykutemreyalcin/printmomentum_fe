@@ -1,11 +1,19 @@
 import { useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router'
 import { ApiError } from '../api/ApiError'
 import { registerUser } from '../api/client'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { translateApiError, useI18n } from '../i18n/I18nProvider'
+import { useToast } from '../components/Toast'
 import './AccountForm.css'
 
 const MIN_PASSWORD_LENGTH = 6
 
 export function CreateUserPage() {
+  usePageTitle('title.createUser')
+  const { t } = useI18n()
+  const navigate = useNavigate()
+  const { showToast } = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState<'user' | 'admin'>('user')
@@ -14,23 +22,21 @@ export function CreateUserPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
-    setSuccess(null)
     if (!name.trim() || !email.trim()) {
-      setError('Name and email are required')
+      setError(t('register.nameEmail'))
       return
     }
     if (password.length < MIN_PASSWORD_LENGTH) {
-      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters`)
+      setError(t('account.minPassword', { n: MIN_PASSWORD_LENGTH }))
       return
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
+      setError(t('account.mismatch'))
       return
     }
     setSubmitting(true)
@@ -42,14 +48,11 @@ export function CreateUserPage() {
         displayName: name.trim(),
         role,
       })
-      setSuccess('User registered successfully')
-      setName('')
-      setEmail('')
-      setPassword('')
-      setConfirmPassword('')
-      setRole('user')
+      showToast(t('register.ok'))
+      navigate('/account/members')
     } catch (cause) {
-      setError(cause instanceof ApiError ? (cause.detail ?? cause.message) : 'Registration failed. Please try again.')
+      const detail = cause instanceof ApiError ? cause.detail : undefined
+      setError(translateApiError(detail, t, 'register.fail'))
     } finally {
       setSubmitting(false)
     }
@@ -58,24 +61,22 @@ export function CreateUserPage() {
   return (
     <div className="account-page">
       <div className="account-card account-card-wide">
-        <p className="label">Members</p>
-        <h2>Register New User</h2>
-        <p className="account-copy">Create a new user account with appropriate access</p>
+        <p className="label">{t('members.label')}</p>
+        <h2>{t('register.title')}</h2>
+        <p className="account-copy">{t('register.copy')}</p>
+        <p className="account-copy">
+          <Link to="/account/members">{t('register.back')}</Link>
+        </p>
         {error && (
           <p className="account-alert account-alert-error" role="alert">
             {error}
-          </p>
-        )}
-        {success && (
-          <p className="account-alert account-alert-ok" role="status">
-            {success}
           </p>
         )}
         <form className="account-form" onSubmit={onSubmit} noValidate>
           <div className="account-grid">
             <label>
               <span className="label">
-                Display Name <span className="account-required">*</span>
+                {t('register.displayName')} <span className="account-required">*</span>
               </span>
               <input
                 type="text"
@@ -87,7 +88,7 @@ export function CreateUserPage() {
             </label>
             <label>
               <span className="label">
-                Email <span className="account-required">*</span>
+                {t('register.email')} <span className="account-required">*</span>
               </span>
               <input
                 type="email"
@@ -98,16 +99,16 @@ export function CreateUserPage() {
               />
             </label>
             <label>
-              <span className="label">User Role</span>
+              <span className="label">{t('register.role')}</span>
               <select value={role} onChange={(event) => setRole(event.target.value as 'user' | 'admin')}>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                <option value="user">{t('register.roleUser')}</option>
+                <option value="admin">{t('register.roleAdmin')}</option>
               </select>
             </label>
             <span />
             <label>
               <span className="label">
-                Password <span className="account-required">*</span>
+                {t('register.password')} <span className="account-required">*</span>
               </span>
               <span className="account-password">
                 <input
@@ -118,13 +119,13 @@ export function CreateUserPage() {
                   required
                 />
                 <button type="button" className="account-reveal" onClick={() => setShowPassword((open) => !open)}>
-                  {showPassword ? 'Hide' : 'Show'}
+                  {showPassword ? t('account.hide') : t('account.show')}
                 </button>
               </span>
             </label>
             <label>
               <span className="label">
-                Confirm Password <span className="account-required">*</span>
+                {t('register.confirm')} <span className="account-required">*</span>
               </span>
               <span className="account-password">
                 <input
@@ -135,14 +136,14 @@ export function CreateUserPage() {
                   required
                 />
                 <button type="button" className="account-reveal" onClick={() => setShowConfirm((open) => !open)}>
-                  {showConfirm ? 'Hide' : 'Show'}
+                  {showConfirm ? t('account.hide') : t('account.show')}
                 </button>
               </span>
             </label>
           </div>
           <div className="account-actions">
             <button type="submit" disabled={submitting}>
-              {submitting ? 'Registering…' : 'Register User'}
+              {submitting ? t('register.busy') : t('register.submit')}
             </button>
           </div>
         </form>

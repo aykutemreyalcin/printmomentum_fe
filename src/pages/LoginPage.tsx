@@ -2,9 +2,14 @@ import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router'
 import { ApiError } from '../api/ApiError'
 import { useAuth } from '../auth/AuthProvider'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { translateApiError, useI18n } from '../i18n/I18nProvider'
+import { ShellControls } from '../components/ShellControls'
 import './LoginPage.css'
 
 export function LoginPage() {
+  usePageTitle('title.signIn')
+  const { t } = useI18n()
   const { auth, login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -26,7 +31,8 @@ export function LoginPage() {
       await login(email, password)
       navigate(from, { replace: true })
     } catch (cause) {
-      setError(cause instanceof ApiError ? (cause.detail ?? cause.message) : 'Login failed')
+      const detail = cause instanceof ApiError ? cause.detail : undefined
+      setError(translateApiError(detail, t, 'auth.loginFailed'))
     } finally {
       setSubmitting(false)
     }
@@ -35,16 +41,20 @@ export function LoginPage() {
   return (
     <div className="login-shell">
       <header className="login-head">
-        <p className="login-mark">PrintMomentum</p>
-        <span className="label">Print-tee index</span>
+        <p className="login-mark">
+          <img src="/pm-logo.png" alt="" width={28} height={28} className="login-logo" />
+          PrintMomentum
+        </p>
+        <span className="label">{t('brand.tagline')}</span>
+        <ShellControls />
       </header>
       <div className="login">
-        <p className="label">Account</p>
-        <h1>Sign in</h1>
-        <p className="login-copy">Same feed for every account. Admin and user both see the ranked print-tee list.</p>
+        <p className="label">{t('auth.account')}</p>
+        <h1>{t('auth.signIn')}</h1>
+        <p className="login-copy">{t('auth.copy')}</p>
         <form className="login-form" onSubmit={onSubmit}>
           <label>
-            <span className="label">Email</span>
+            <span className="label">{t('auth.email')}</span>
             <input
               type="email"
               autoComplete="username"
@@ -54,7 +64,7 @@ export function LoginPage() {
             />
           </label>
           <label>
-            <span className="label">Password</span>
+            <span className="label">{t('auth.password')}</span>
             <input
               type="password"
               autoComplete="current-password"
@@ -65,7 +75,7 @@ export function LoginPage() {
           </label>
           {error && <p className="login-error">{error}</p>}
           <button type="submit" disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+            {submitting ? t('auth.signInBusy') : t('auth.signIn')}
           </button>
         </form>
       </div>

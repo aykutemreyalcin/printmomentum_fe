@@ -1,15 +1,10 @@
-import type { ReactElement, ReactNode } from 'react'
-import { render } from '@testing-library/react'
-import { MemoryRouter } from 'react-router'
-import { AppTheme } from '../theme/AppTheme'
+import type { ReactElement } from 'react'
+import { TestProviders } from './TestProviders'
 
 export function renderWithApp(ui: ReactElement, route = '/') {
-  function Wrapper({ children }: { children: ReactNode }) {
-    return (
-      <AppTheme>
-        <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
-      </AppTheme>
-    )
-  }
-  return render(ui, { wrapper: Wrapper })
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { render } = require('@testing-library/react') as typeof import('@testing-library/react')
+  return render(ui, {
+    wrapper: ({ children }) => <TestProviders route={route}>{children}</TestProviders>,
+  })
 }
