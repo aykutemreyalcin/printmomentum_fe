@@ -31,7 +31,7 @@ export function Sparkline({ snapshots, metric = 'position', label }: Props) {
   const max = Math.max(...numeric)
   const span = Math.max(max - min, 1)
   const last = snapshots.length - 1
-  const points = snapshots.flatMap((snapshot, index) => {
+  const points = snapshots.flatMap((_, index) => {
     const value = values[index]
     if (value == null) {
       return []

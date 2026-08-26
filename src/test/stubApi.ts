@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { expect, vi } from 'vitest'
 import { AUTH_LOCAL_STORAGE_KEY } from '../auth/_helpers'
 
 export const healthBody = { status: 'ok', service: 'printmomentum-be' }
