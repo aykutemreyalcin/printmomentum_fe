@@ -99,6 +99,20 @@ describe('FeedPage', () => {
     expect(screen.getByRole('link', { name: 'Open listing' })).toHaveAttribute('href', '/listings/2')
   })
 
+  it('expands a listing row when clicking anywhere on the row', async () => {
+    stubApi({
+      items: [listingFixture({ listingId: 2, title: 'Fast Tee', momentumScore: 2.4, rank: 1 })],
+    })
+    const user = userEvent.setup()
+
+    renderWithApp(<FeedPage />)
+
+    await screen.findByText('Fast Tee')
+    await user.click(screen.getByText('01'))
+
+    expect(await screen.findByRole('link', { name: 'View on Etsy' })).toBeInTheDocument()
+  })
+
   it('filters the feed to bestsellers without clearing other presets', async () => {
     stubApi({ items: [] })
     const fetchMock = vi.mocked(fetch)
