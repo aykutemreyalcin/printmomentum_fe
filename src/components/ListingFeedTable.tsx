@@ -8,7 +8,7 @@ import {
   type MRT_Updater,
   type MRT_VisibilityState,
 } from 'material-react-table'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ListingFeedItem } from '../api/types'
 import { useCompare } from '../compare/CompareProvider'
 import { useI18n, type Translate } from '../i18n/I18nProvider'
@@ -113,15 +113,6 @@ export function ListingFeedTable({
   useEffect(() => saveJson(VISIBILITY_KEY, columnVisibility), [columnVisibility])
   useEffect(() => saveJson(ORDER_KEY, columnOrder), [columnOrder])
   useEffect(() => localStorage.setItem(PAGE_SIZE_KEY, String(pageSize)), [pageSize])
-
-  const resetColumns = useCallback(() => {
-    localStorage.removeItem(VISIBILITY_KEY)
-    localStorage.removeItem(ORDER_KEY)
-    localStorage.removeItem(PAGE_SIZE_KEY)
-    setColumnVisibility({ ...DEFAULT_VISIBILITY })
-    setColumnOrder([...DEFAULT_ORDER])
-    onPaginationChange({ pageIndex: 0, pageSize: 25 })
-  }, [onPaginationChange])
 
   const table = useMaterialReactTable({
     columns,
@@ -230,11 +221,6 @@ export function ListingFeedTable({
       showHideColumns: t('table.showColumns'),
       showHideFilters: t('table.showFilters'),
     },
-    renderTopToolbarCustomActions: () => (
-      <button type="button" className="listing-reset-cols label" onClick={resetColumns}>
-        {t('table.reset')}
-      </button>
-    ),
     renderDetailPanel: ({ row }) => (
       <ListingDetailPanel listing={row.original} onToggleFavorite={onToggleFavorite} t={t} glossary={glossary} />
     ),

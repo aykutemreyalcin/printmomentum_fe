@@ -160,20 +160,6 @@
   cursor: help;
 }
 
-.listing-reset-cols {
-  border: 1px solid var(--hair);
-  border-radius: 8px;
-  background: var(--surface);
-  padding: 6px 10px;
-  cursor: pointer;
-  color: var(--ink);
-}
-
-.listing-reset-cols:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
 .listing-compare-check {
   width: 16px;
   height: 16px;
