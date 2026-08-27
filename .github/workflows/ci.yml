@@ -66,6 +66,7 @@ jobs:
             "set -euo pipefail",
             "install -d -m 755 /opt/printmomentum/app",
             f"aws s3 sync s3://{bucket}/host/app/ /opt/printmomentum/app --delete",
+            f"aws s3 cp s3://{bucket}/host/app/index.html /opt/printmomentum/app/index.html",
             "cd /opt/printmomentum && docker compose --env-file .env up -d --force-recreate --no-deps caddy",
             "docker compose --env-file /opt/printmomentum/.env -f /opt/printmomentum/docker-compose.yml ps caddy",
           ]}))
