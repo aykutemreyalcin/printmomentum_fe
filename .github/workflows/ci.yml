@@ -67,7 +67,7 @@ jobs:
             "install -d -m 755 /opt/printmomentum/app",
             f"aws s3 sync s3://{bucket}/host/app/ /opt/printmomentum/app --delete",
             "cd /opt/printmomentum && docker compose --env-file .env up -d --force-recreate --no-deps caddy",
-            "curl -sf -o /dev/null -w 'local_http=%{http_code}\\n' http://127.0.0.1/",
+            "docker compose --env-file /opt/printmomentum/.env -f /opt/printmomentum/docker-compose.yml ps caddy",
           ]}))
           PY
           CMD_ID=$(aws ssm send-command \
@@ -100,4 +100,12 @@ jobs:
           echo "SSM command timed out waiting for completion"
           exit 1
       - name: Verify public app
-        run: curl -sf -o /dev/null "https://app.printmomentum.com/"
+        run: |
+          for i in $(seq 1 12); do
+            if curl -sf -o /dev/null "https://app.printmomentum.com/"; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "App check failed after Caddy reload"
+          exit 1
