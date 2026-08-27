@@ -218,9 +218,16 @@ export function ListingFeedTable({
         },
       },
     },
-    muiTableBodyRowProps: {
+    muiTableBodyRowProps: ({ row }) => ({
       hover: true,
-    },
+      onClick: (event) => {
+        if (shouldIgnoreRowExpandClick(event.target)) {
+          return
+        }
+        row.toggleExpanded()
+      },
+      sx: { cursor: 'pointer' },
+    }),
     muiCircularProgressProps: { color: 'primary', size: 40 },
     muiSkeletonProps: { animation: 'wave', height: 28 },
     localization: {
@@ -670,6 +677,17 @@ function ExpandMetric({
         <p className={['listing-expand-value', 'numeric', accent && 'is-accent'].filter(Boolean).join(' ')}>{value}</p>
       </div>
     </Tooltip>
+  )
+}
+
+function shouldIgnoreRowExpandClick(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) {
+    return false
+  }
+  return Boolean(
+    target.closest(
+      'a, button, input, textarea, select, label, [role="button"], [contenteditable="true"], .listing-detail-panel',
+    ),
   )
 }
 
