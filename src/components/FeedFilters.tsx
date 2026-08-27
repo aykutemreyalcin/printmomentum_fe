@@ -46,64 +46,79 @@ export function FeedFilters({
 
   return (
     <form className="feed-filters" onSubmit={(event) => event.preventDefault()}>
-      <div className="feed-presets" role="group" aria-label={t('filters.momentumPeriod')}>
-        {MOMENTUM_PERIODS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={['feed-preset', momentumPeriod === item.id && 'is-on'].filter(Boolean).join(' ')}
-            aria-pressed={momentumPeriod === item.id}
-            onClick={() => onMomentumPeriod(item.id)}
-          >
-            {t(item.key)}
-          </button>
-        ))}
-      </div>
-      <div className="feed-presets" role="group" aria-label={t('filters.presets')}>
-        {PRESETS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={['feed-preset', preset === item.id && 'is-on'].filter(Boolean).join(' ')}
-            aria-pressed={preset === item.id}
-            onClick={() => onPreset(preset === item.id ? '' : item.id)}
-          >
-            {t(item.key)}
-          </button>
-        ))}
-      </div>
-      <div className="feed-presets feed-bestseller-filter" role="group" aria-label={t('filters.bestseller')}>
-        <button
-          type="button"
-          className={['feed-preset', bestseller && 'is-on'].filter(Boolean).join(' ')}
-          aria-pressed={bestseller}
-          onClick={() => onBestseller(!bestseller)}
+      <section className="feed-momentum-bar">
+        <span className="label feed-section-label">{t('filters.momentumPeriod')}</span>
+        <div
+          className="feed-momentum-segmented"
+          role="group"
+          aria-label={t('filters.momentumPeriod')}
         >
-          {t('filters.bestsellersOnly')}
-        </button>
-      </div>
-      <label>
-        <span className="label">{t('filters.maxDays')}</span>
-        <input
-          type="number"
-          min={0}
-          step="any"
-          inputMode="decimal"
-          value={maxDaysToTop}
-          onChange={(event) => onMaxDaysToTop(event.target.value)}
-        />
-      </label>
-      <label>
-        <span className="label">{t('filters.minScore')}</span>
-        <input
-          type="number"
-          min={0}
-          step="any"
-          inputMode="decimal"
-          value={minScore}
-          onChange={(event) => onMinScore(event.target.value)}
-        />
-      </label>
+          {MOMENTUM_PERIODS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={['feed-momentum-segment', momentumPeriod === item.id && 'is-on']
+                .filter(Boolean)
+                .join(' ')}
+              aria-pressed={momentumPeriod === item.id}
+              onClick={() => onMomentumPeriod(item.id)}
+            >
+              {t(item.key)}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="feed-filter-bar">
+        <span className="label feed-section-label">{t('filters.filterSection')}</span>
+        <div className="feed-filter-row">
+          <div className="feed-presets" role="group" aria-label={t('filters.presets')}>
+            {PRESETS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={['feed-preset', preset === item.id && 'is-on'].filter(Boolean).join(' ')}
+                aria-pressed={preset === item.id}
+                onClick={() => onPreset(preset === item.id ? '' : item.id)}
+              >
+                {t(item.key)}
+              </button>
+            ))}
+          </div>
+          <div className="feed-presets feed-bestseller-filter" role="group" aria-label={t('filters.bestseller')}>
+            <button
+              type="button"
+              className={['feed-preset', bestseller && 'is-on'].filter(Boolean).join(' ')}
+              aria-pressed={bestseller}
+              onClick={() => onBestseller(!bestseller)}
+            >
+              {t('filters.bestsellersOnly')}
+            </button>
+          </div>
+          <label>
+            <span className="label">{t('filters.maxDays')}</span>
+            <input
+              type="number"
+              min={0}
+              step="any"
+              inputMode="decimal"
+              value={maxDaysToTop}
+              onChange={(event) => onMaxDaysToTop(event.target.value)}
+            />
+          </label>
+          <label>
+            <span className="label">{t('filters.minScore')}</span>
+            <input
+              type="number"
+              min={0}
+              step="any"
+              inputMode="decimal"
+              value={minScore}
+              onChange={(event) => onMinScore(event.target.value)}
+            />
+          </label>
+        </div>
+      </section>
     </form>
   )
 }
