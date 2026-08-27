@@ -38,7 +38,7 @@ type Props = {
   emptyMessage?: string
 }
 
-const VISIBILITY_KEY = 'printmomentum-table-columns-feed-v3'
+const VISIBILITY_KEY = 'printmomentum-table-columns-feed-v4'
 const ORDER_KEY = 'printmomentum-table-order-feed-v3'
 const PAGE_SIZE_KEY = 'printmomentum-table-pagesize-feed-v2'
 
@@ -64,7 +64,15 @@ const DEFAULT_ORDER = [
   'momentumScore',
 ]
 
+/** Main table: core scan columns. All other fields live in the expand panel. */
 const DEFAULT_VISIBILITY: MRT_VisibilityState = {
+  reviews30d: false,
+  estSales30d: false,
+  deltaFavorers7d: false,
+  deltaViews7d: false,
+  daysToTop: false,
+  ageDays: false,
+  shopSales: false,
   listingId: false,
   quantity: false,
   whoMade: false,
@@ -565,7 +573,7 @@ function ListingDetailPanel({
   return (
     <div className="listing-detail-panel">
       {listing.imageUrl ? <img src={listing.imageUrl} alt="" /> : null}
-      <div>
+      <div className="listing-detail-body">
         {listing.shopId ? (
           <Link className="label" to={`/shops/${listing.shopId}`}>
             {listing.shopName}
@@ -574,43 +582,55 @@ function ListingDetailPanel({
           <p className="label">{listing.shopName}</p>
         )}
         <p className="listing-detail-title">{listing.title}</p>
-        <div className="listing-detail-metrics">
-          <span>{formatMoney(listing.price, listing.currency)}</span>
-          <MetricTip title={glossary.favsHover(listing)}>
-            <span>
-              {formatCount(listing.numFavorers)} {t('table.favs').toLowerCase()}
-            </span>
-          </MetricTip>
-          <MetricTip title={glossary.viewsHover(listing)}>
-            <span>
-              {formatCount(listing.views)} {t('table.views').toLowerCase()}
-            </span>
-          </MetricTip>
-          <span>
-            {formatCount(listing.reviews30d)} {t('table.reviews30d').toLowerCase()}
+        <p className="listing-detail-price numeric">{formatMoney(listing.price, listing.currency)}</p>
+        <div className="listing-detail-id-row">
+          <span className="label">
+            {t('table.listingId')} {listing.listingId}
           </span>
-          <MetricTip title={glossary.estSalesHover(listing)}>
-            <span>
-              {formatCount(listing.estSales30d)} {t('table.estSales').toLowerCase()}
-            </span>
-          </MetricTip>
-          <span>
-            {formatDelta(listing.deltaFavorers7d)} {t('table.deltaFav').toLowerCase()}
-          </span>
-          <MetricTip title={glossary.daysToTopHover(listing)}>
-            <span>
-              {t('table.reachedTopNInSummary', { days: formatDays(listing.daysToTop) })}
-            </span>
-          </MetricTip>
-          <MetricTip title={glossary.momentum}>
-            <span className="listing-detail-mom">
-              {formatScore(listing.momentumScore)} {t('table.momentum').toLowerCase()}
-            </span>
-          </MetricTip>
+          <CopyButton text={String(listing.listingId)} label={t('table.copyId')} />
           <BestsellerBadge listing={listing} />
         </div>
+        <div className="listing-detail-grid">
+          <ExpandMetric label={t('table.momentum')} value={formatScore(listing.momentumScore)} hint={glossary.momentum} accent />
+          <ExpandMetric
+            label={t('table.daysToTop')}
+            value={
+              listing.daysToTop == null
+                ? '—'
+                : `${formatDays(listing.daysToTop)} ${t('table.climbDaysUnit')}`
+            }
+            hint={glossary.daysToTopHover(listing)}
+          />
+          <ExpandMetric label={t('table.favs')} value={formatCount(listing.numFavorers)} hint={glossary.favsHover(listing)} />
+          <ExpandMetric label={t('table.deltaFav')} value={formatDelta(listing.deltaFavorers7d)} hint={glossary.favsHover(listing)} />
+          <ExpandMetric label={t('table.views')} value={formatCount(listing.views)} hint={glossary.viewsHover(listing)} />
+          <ExpandMetric label={t('table.deltaViews')} value={formatDelta(listing.deltaViews7d)} hint={glossary.viewsHover(listing)} />
+          <ExpandMetric label={t('table.reviews30d')} value={formatCount(listing.reviews30d)} hint={glossary.lastReviewHover(listing)} />
+          <ExpandMetric label={t('table.estSales')} value={formatCount(listing.estSales30d)} hint={glossary.estSalesHover(listing)} />
+          <ExpandMetric
+            label={t('detail.metric.estRevenue')}
+            value={formatMoney(listing.estRevenue30d, listing.currency)}
+            hint={glossary.estSalesHover(listing)}
+          />
+          <ExpandMetric label={t('table.age')} value={formatAgeDays(listing.ageDays)} hint={glossary.ageHover(listing)} />
+          <ExpandMetric label={t('table.shopSales')} value={formatCount(listing.shopSales)} hint={glossary.shopSalesHover(listing)} />
+          <ExpandMetric label={t('table.qty')} value={formatCount(listing.quantity)} hint={glossary.quantityHover(listing)} />
+          <ExpandMetric
+            label={t('table.shopRating')}
+            value={listing.shopRating == null ? '—' : listing.shopRating.toFixed(2)}
+            hint={glossary.shopSalesHover(listing)}
+          />
+          <ExpandMetric label={t('table.shopReviews')} value={formatCount(listing.shopReviewCount)} hint={glossary.shopSalesHover(listing)} />
+          <ExpandMetric label={t('table.shopId')} value={listing.shopId == null ? '—' : String(listing.shopId)} hint={glossary.shopSalesHover(listing)} />
+          <ExpandMetric label={t('table.whoMade')} value={listing.whoMade || '—'} hint={glossary.ageHover(listing)} />
+          <ExpandMetric label={t('table.whenMade')} value={listing.whenMade || '—'} hint={glossary.ageHover(listing)} />
+          <ExpandMetric label={t('table.firstSeen')} value={formatShortDate(listing.firstSeenAt)} hint={glossary.daysToTopHover(listing)} />
+          <ExpandMetric label={t('table.created')} value={formatShortDate(listing.originalCreatedAt)} hint={glossary.ageHover(listing)} />
+          <ExpandMetric label={t('table.lastSeen')} value={formatShortDate(listing.lastSeenAt)} hint={glossary.lastReviewHover(listing)} />
+          <ExpandMetric label={t('table.lastReview')} value={formatShortDate(listing.lastReviewAt)} hint={glossary.lastReviewHover(listing)} />
+        </div>
         {listing.queryHits && listing.queryHits.length > 0 ? (
-          <p className="label">
+          <p className="label listing-detail-queries">
             {listing.queryHits.map((hit) => (
               <MetricTip key={hit.query} title={glossary.queryHitHover(hit.query, hit.position)}>
                 <span className="listing-query-hit">
@@ -629,6 +649,27 @@ function ListingDetailPanel({
         </div>
       </div>
     </div>
+  )
+}
+
+function ExpandMetric({
+  label,
+  value,
+  hint,
+  accent,
+}: {
+  label: string
+  value: string
+  hint: string
+  accent?: boolean
+}) {
+  return (
+    <Tooltip title={hint} enterDelay={250}>
+      <div className="listing-expand-metric">
+        <span className="label">{label}</span>
+        <p className={['listing-expand-value', 'numeric', accent && 'is-accent'].filter(Boolean).join(' ')}>{value}</p>
+      </div>
+    </Tooltip>
   )
 }
 

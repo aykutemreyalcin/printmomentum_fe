@@ -118,30 +118,70 @@
   background: var(--surface);
 }
 
+.listing-detail-body {
+  min-width: 0;
+}
+
 .listing-detail-title {
   margin-top: 6px;
   font-size: 16px;
   font-weight: 600;
 }
 
-.listing-detail-metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  margin-top: 10px;
-  font-size: 13px;
-  color: var(--muted);
+.listing-detail-price {
+  margin-top: 6px;
+  font-size: 15px;
 }
 
-.listing-detail-mom {
+.listing-detail-id-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.listing-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 14px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.listing-expand-metric {
+  padding: 10px 12px;
+  cursor: help;
+  border-right: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+}
+
+.listing-expand-metric:nth-child(4n) {
+  border-right: 0;
+}
+
+.listing-expand-value {
+  margin: 6px 0 0;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.listing-expand-value.is-accent {
   color: var(--primary);
   font-weight: 600;
 }
 
+.listing-detail-queries {
+  margin-top: 12px;
+}
+
 .listing-detail-links {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .listing-detail-links a {
@@ -171,8 +211,44 @@
   max-width: 100%;
 }
 
+@media (max-width: 1100px) {
+  .listing-detail-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .listing-expand-metric:nth-child(4n) {
+    border-right: 1px solid var(--hair);
+  }
+
+  .listing-expand-metric:nth-child(3n) {
+    border-right: 0;
+  }
+}
+
 @media (max-width: 700px) {
   .listing-detail-panel {
     grid-template-columns: 1fr;
+  }
+
+  .listing-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .listing-expand-metric:nth-child(3n) {
+    border-right: 1px solid var(--hair);
+  }
+
+  .listing-expand-metric:nth-child(2n) {
+    border-right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .listing-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .listing-expand-metric {
+    border-right: 0;
   }
 }
