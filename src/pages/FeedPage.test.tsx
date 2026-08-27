@@ -34,7 +34,8 @@ describe('FeedPage', () => {
     renderWithApp(<FeedPage />)
 
     expect(await screen.findByText('No printable tees match. Widen filters.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Export CSV' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Export all' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Export selected' })).toBeDisabled()
   })
 
   it('explains a pending first crawl when the index has zero listings', async () => {

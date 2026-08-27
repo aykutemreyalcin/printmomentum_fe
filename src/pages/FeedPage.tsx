@@ -3,10 +3,12 @@ import { FeedFilters } from '../components/FeedFilters'
 import { ListingFeedTable, loadFeedPageSize } from '../components/ListingFeedTable'
 import { getHealth } from '../api/client'
 import type { Health } from '../api/types'
+import { useCompare } from '../compare/CompareProvider'
 import { useFeedFilters } from '../hooks/useFeedFilters'
 import { useListings } from '../hooks/useListings'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useI18n } from '../i18n/I18nProvider'
+import { fetchAllListings, fetchListingsByIds } from '../lib/exportListings'
 import { downloadCsv, listingsToCsv } from '../lib/listingsCsv'
 import { formatIstanbulClock } from '../lib/format'
 import './FeedPage.css'
@@ -14,8 +16,10 @@ import './FeedPage.css'
 export function FeedPage() {
   usePageTitle('title.feed')
   const { t } = useI18n()
+  const { ids: compareIds } = useCompare()
   const filters = useFeedFilters()
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: loadFeedPageSize() })
+  const [exporting, setExporting] = useState<'all' | 'selected' | null>(null)
   const filterKey = useMemo(
     () =>
       `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}`,
@@ -55,6 +59,36 @@ export function FeedPage() {
       ? t('feed.emptyIndex', { time: formatIstanbulClock(health?.nextCrawlAt) })
       : t('feed.emptyFilters')
 
+  const exportDate = new Date().toISOString().slice(0, 10)
+  const exportBusy = exporting !== null
+  const canExportAll = (page?.total ?? 0) > 0 && !exportBusy
+  const canExportSelected = compareIds.length > 0 && !exportBusy
+
+  async function exportAll() {
+    setExporting('all')
+    try {
+      const all = await fetchAllListings(filters.query)
+      downloadCsv(`printmomentum-feed-all-${exportDate}.csv`, listingsToCsv(all))
+    } finally {
+      setExporting(null)
+    }
+  }
+
+  async function exportSelected() {
+    setExporting('selected')
+    try {
+      const onPage = items.filter((item) => compareIds.includes(item.listingId))
+      const missingIds = compareIds.filter((id) => !onPage.some((item) => item.listingId === id))
+      const fetched = missingIds.length > 0 ? await fetchListingsByIds(missingIds) : []
+      const selected = compareIds
+        .map((id) => onPage.find((item) => item.listingId === id) ?? fetched.find((item) => item.listingId === id))
+        .filter((item): item is NonNullable<typeof item> => item != null)
+      downloadCsv(`printmomentum-feed-selected-${exportDate}.csv`, listingsToCsv(selected))
+    } finally {
+      setExporting(null)
+    }
+  }
+
   return (
     <div className="feed">
       <div className="page-toolbar">
@@ -73,16 +107,24 @@ export function FeedPage() {
           </p>
         </div>
         {sample && <p className="feed-sample label">{t('feed.sample')}</p>}
-        <button
-          type="button"
-          className="feed-export"
-          disabled={items.length === 0}
-          onClick={() =>
-            downloadCsv(`printmomentum-feed-${new Date().toISOString().slice(0, 10)}.csv`, listingsToCsv(items))
-          }
-        >
-          {t('feed.export')}
-        </button>
+        <div className="feed-export-group">
+          <button
+            type="button"
+            className="feed-export"
+            disabled={!canExportAll}
+            onClick={() => void exportAll()}
+          >
+            {exporting === 'all' ? t('feed.exporting') : t('feed.exportAll')}
+          </button>
+          <button
+            type="button"
+            className="feed-export"
+            disabled={!canExportSelected}
+            onClick={() => void exportSelected()}
+          >
+            {exporting === 'selected' ? t('feed.exporting') : t('feed.exportSelected')}
+          </button>
+        </div>
       </div>
 
       <FeedFilters

@@ -89,21 +89,33 @@ export function ComparePage() {
       ) : !left || !right ? (
         <p className="compare-copy">{t('feed.loading')}</p>
       ) : (
-        <div className="compare-grid">
-          <CompareCard listing={left} t={t} />
-          <CompareCard listing={right} t={t} />
-          <table className="compare-table">
-            <tbody>
-              {ROWS.map((key) => (
-                <tr key={key}>
-                  <th title={rowHint(key, left, glossary)}>{rowLabel(key, t)}</th>
-                  <td className="numeric">{rowValue(key, left)}</td>
-                  <td className="numeric">{rowValue(key, right)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table className="compare-table">
+          <colgroup>
+            <col className="compare-col-label" />
+            <col className="compare-col-listing" />
+            <col className="compare-col-listing" />
+          </colgroup>
+          <tbody>
+            <tr className="compare-header-row">
+              <td className="compare-corner" aria-hidden="true" />
+              <td className="compare-listing-cell">
+                <CompareCard listing={left} t={t} />
+              </td>
+              <td className="compare-listing-cell">
+                <CompareCard listing={right} t={t} />
+              </td>
+            </tr>
+            {ROWS.map((key) => (
+              <tr key={key}>
+                <th scope="row" title={rowHint(key, left, glossary)}>
+                  {rowLabel(key, t)}
+                </th>
+                <td className="numeric">{rowValue(key, left)}</td>
+                <td className="numeric">{rowValue(key, right)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   )
