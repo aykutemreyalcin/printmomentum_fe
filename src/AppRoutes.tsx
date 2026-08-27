@@ -3,6 +3,7 @@ import { RequireAdmin } from './auth/RequireAdmin'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
 import { ChangePasswordPage } from './pages/ChangePasswordPage'
+import { ChartsPage } from './pages/ChartsPage'
 import { ComparePage } from './pages/ComparePage'
 import { CreateUserPage } from './pages/CreateUserPage'
 import { FavoritesPage } from './pages/FavoritesPage'
@@ -22,6 +23,7 @@ export function AppRoutes() {
         <Route element={<Layout />}>
           <Route index element={<FeedPage />} />
           <Route path="favorites" element={<FavoritesPage />} />
+          <Route path="charts" element={<ChartsPage />} />
           <Route path="compare" element={<ComparePage />} />
           <Route path="listings/:listingId" element={<ListingDetailPage />} />
           <Route path="shops/:shopId" element={<ShopPage />} />
