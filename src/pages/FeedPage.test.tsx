@@ -113,6 +113,31 @@ describe('FeedPage', () => {
     expect(await screen.findByRole('link', { name: 'View on Etsy' })).toBeInTheDocument()
   })
 
+  it('calls the listings API with weekly momentum by default', async () => {
+    stubApi({ items: [] })
+    const fetchMock = vi.mocked(fetch)
+
+    renderWithApp(<FeedPage />)
+
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.some((call) => String(call[0]).includes('momentumPeriod=weekly'))).toBe(true)
+    })
+  })
+
+  it('switches momentum period when a window pill is clicked', async () => {
+    stubApi({ items: [] })
+    const fetchMock = vi.mocked(fetch)
+    const user = userEvent.setup()
+
+    renderWithApp(<FeedPage />)
+
+    await user.click(await screen.findByRole('button', { name: 'Daily' }))
+
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.some((call) => String(call[0]).includes('momentumPeriod=daily'))).toBe(true)
+    })
+  })
+
   it('filters the feed to bestsellers without clearing other presets', async () => {
     stubApi({ items: [] })
     const fetchMock = vi.mocked(fetch)

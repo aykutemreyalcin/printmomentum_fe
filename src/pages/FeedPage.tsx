@@ -22,8 +22,8 @@ export function FeedPage() {
   const [exporting, setExporting] = useState<'all' | 'selected' | null>(null)
   const filterKey = useMemo(
     () =>
-      `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}`,
-    [filters.maxDaysToTop, filters.minScore, filters.q, filters.preset, filters.bestseller],
+      `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}|${filters.momentumPeriod}`,
+    [filters.maxDaysToTop, filters.minScore, filters.q, filters.preset, filters.bestseller, filters.momentumPeriod],
   )
   useEffect(() => {
     setPagination((current) => ({ ...current, pageIndex: 0 }))
@@ -132,10 +132,12 @@ export function FeedPage() {
         minScore={filters.minScore}
         preset={filters.preset}
         bestseller={filters.bestseller}
+        momentumPeriod={filters.momentumPeriod}
         onMaxDaysToTop={filters.setMaxDaysToTop}
         onMinScore={filters.setMinScore}
         onPreset={filters.setPreset}
         onBestseller={filters.setBestseller}
+        onMomentumPeriod={filters.setMomentumPeriod}
       />
 
       <ListingFeedTable

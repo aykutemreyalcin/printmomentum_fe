@@ -1,4 +1,4 @@
-import type { FeedPreset } from '../api/types'
+import type { FeedPreset, MomentumPeriod } from '../api/types'
 import { useI18n } from '../i18n/I18nProvider'
 import type { MessageKey } from '../i18n/messages'
 import './FeedFilters.css'
@@ -11,15 +11,23 @@ const PRESETS: { id: FeedPreset; key: MessageKey }[] = [
   { id: 'climbing', key: 'filters.climbing' },
 ]
 
+const MOMENTUM_PERIODS: { id: MomentumPeriod; key: MessageKey }[] = [
+  { id: 'daily', key: 'filters.momentumDaily' },
+  { id: 'weekly', key: 'filters.momentumWeekly' },
+  { id: 'monthly', key: 'filters.momentumMonthly' },
+]
+
 type Props = {
   maxDaysToTop: string
   minScore: string
   preset: string
   bestseller: boolean
+  momentumPeriod: MomentumPeriod
   onMaxDaysToTop: (value: string) => void
   onMinScore: (value: string) => void
   onPreset: (value: string) => void
   onBestseller: (value: boolean) => void
+  onMomentumPeriod: (value: MomentumPeriod) => void
 }
 
 export function FeedFilters({
@@ -27,15 +35,30 @@ export function FeedFilters({
   minScore,
   preset,
   bestseller,
+  momentumPeriod,
   onMaxDaysToTop,
   onMinScore,
   onPreset,
   onBestseller,
+  onMomentumPeriod,
 }: Props) {
   const { t } = useI18n()
 
   return (
     <form className="feed-filters" onSubmit={(event) => event.preventDefault()}>
+      <div className="feed-presets" role="group" aria-label={t('filters.momentumPeriod')}>
+        {MOMENTUM_PERIODS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={['feed-preset', momentumPeriod === item.id && 'is-on'].filter(Boolean).join(' ')}
+            aria-pressed={momentumPeriod === item.id}
+            onClick={() => onMomentumPeriod(item.id)}
+          >
+            {t(item.key)}
+          </button>
+        ))}
+      </div>
       <div className="feed-presets" role="group" aria-label={t('filters.presets')}>
         {PRESETS.map((item) => (
           <button

@@ -25,7 +25,7 @@ export function ChartsPage() {
     let cancelled = false
     setLoading(true)
     setError(null)
-    void getTopChart({ limit: TOP_LIMIT, snapshotLimit: 90 })
+    void getTopChart({ limit: TOP_LIMIT, snapshotLimit: 90, momentumPeriod: 'weekly' })
       .then((response) => {
         if (!cancelled) {
           setItems(response.items)

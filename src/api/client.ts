@@ -78,6 +78,7 @@ export async function getTopChart(query: TopChartQuery = {}): Promise<TopChartRe
   return request(`/v1/listings/top-chart${toQuery({
     limit: query.limit,
     snapshotLimit: query.snapshotLimit,
+    momentumPeriod: query.momentumPeriod,
   })}`)
 }
 
@@ -91,6 +92,7 @@ export async function getListings(query: ListingsQuery = {}): Promise<ListingPag
     shopId: query.shopId,
     preset: query.preset,
     bestseller: query.bestseller,
+    momentumPeriod: query.momentumPeriod,
   })}`)
 }
 
