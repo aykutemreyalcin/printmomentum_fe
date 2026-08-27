@@ -95,6 +95,7 @@ export function stubApi(
     status?: number
     detailOk?: boolean
     detailStatus?: number
+    topChart?: unknown[]
     shopOk?: boolean
     shopStatus?: number
   } = {},
@@ -221,6 +222,22 @@ export function stubApi(
                   indexedListingCount: items.length,
                 })
               : { title: 'Not Found', status: shopStatus, detail: 'shop not found' },
+        }
+      }
+      if (url.includes('/v1/listings/top-chart')) {
+        const chartItems = (options.topChart ?? items).map((item) =>
+          typeof item === 'object' && item !== null && 'snapshots' in item
+            ? item
+            : detailFixture({ listingId: (item as { listingId?: number }).listingId ?? 9101 }),
+        )
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            limit: 30,
+            snapshotLimit: 90,
+            items: chartItems,
+          }),
         }
       }
       const detailMatch = url.match(/\/v1\/listings\/(\d+)/)

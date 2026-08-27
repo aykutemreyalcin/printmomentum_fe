@@ -1,0 +1,137 @@
+.charts-page {
+  width: 100%;
+}
+
+.charts-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.charts-head h2 {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.charts-copy {
+  margin-top: 6px;
+  max-width: 56ch;
+}
+
+.charts-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.charts-metric {
+  padding: 7px 12px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.charts-metric.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.charts-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 16px;
+}
+
+.charts-panel,
+.charts-side {
+  padding: 16px;
+}
+
+.charts-side-empty {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.charts-selected {
+  display: grid;
+  gap: 12px;
+}
+
+.charts-selected img {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 10px;
+  border: 1px solid var(--hair);
+}
+
+.charts-selected h3 {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.charts-selected dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  font-size: 14px;
+}
+
+.charts-selected dt {
+  color: var(--muted);
+}
+
+.charts-selected-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.charts-selected-actions a {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--hair);
+}
+
+.charts-hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.charts-empty,
+.charts-loading,
+.charts-error {
+  padding: 24px 0;
+  color: var(--muted);
+}
+
+.multi-line-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.multi-line-chart-grid {
+  stroke: var(--hair);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.multi-line-chart-line {
+  cursor: pointer;
+  transition: stroke-width 120ms ease, opacity 120ms ease;
+}
+
+.multi-line-chart-hit {
+  cursor: pointer;
+}
+
+@media (max-width: 960px) {
+  .charts-layout {
+    grid-template-columns: 1fr;
+  }
+}

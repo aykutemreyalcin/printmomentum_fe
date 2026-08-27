@@ -9,6 +9,8 @@ import type {
   ListingsQuery,
   QueryStats,
   Shop,
+  TopChartQuery,
+  TopChartResponse,
 } from './types'
 
 const API_BASE = '/api'
@@ -70,6 +72,13 @@ export async function updateProfile(body: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
+}
+
+export async function getTopChart(query: TopChartQuery = {}): Promise<TopChartResponse> {
+  return request(`/v1/listings/top-chart${toQuery({
+    limit: query.limit,
+    snapshotLimit: query.snapshotLimit,
+  })}`)
 }
 
 export async function getListings(query: ListingsQuery = {}): Promise<ListingPage> {

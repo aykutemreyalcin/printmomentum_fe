@@ -118,6 +118,37 @@ export type ListingDetail = ListingFeedItem & {
   rejectReasons?: string[]
 }
 
+export type TopChartSnapshot = {
+  observedAt: string
+  position: number
+  numFavorers: number
+  views?: number | null
+  quantity?: number | null
+}
+
+export type TopChartItem = {
+  listingId: number
+  title: string
+  imageUrl: string | null
+  etsyUrl: string
+  momentumScore: number | null
+  daysToTop: number | null
+  numFavorers: number
+  views?: number | null
+  snapshots: TopChartSnapshot[]
+}
+
+export type TopChartResponse = {
+  limit: number
+  snapshotLimit: number
+  items: TopChartItem[]
+}
+
+export type TopChartQuery = {
+  limit?: number
+  snapshotLimit?: number
+}
+
 export type FeedPreset =
   | 'seen-today'
   | 'created-today'
