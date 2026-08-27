@@ -11,21 +11,26 @@ describe('FeedPage', () => {
     localStorage.clear()
   })
 
-  it('shows titles and days-to-top for two listings', async () => {
+  it('shows core table columns and full metrics in the expand panel', async () => {
     stubApi({
       items: [
-        listingFixture({ listingId: 1, title: 'Y2K Chrome Butterfly Baby Tee', daysToTop: 1.6 }),
-        listingFixture({ listingId: 2, title: 'Retro Sunset Cassette Graphic Tee', daysToTop: 2.1 }),
+        listingFixture({ listingId: 1, title: 'Y2K Chrome Butterfly Baby Tee', daysToTop: 1.6, momentumScore: 3.1 }),
+        listingFixture({ listingId: 2, title: 'Retro Sunset Cassette Graphic Tee', daysToTop: 2.1, momentumScore: 2.8 }),
       ],
     })
+    const user = userEvent.setup()
 
     renderWithApp(<FeedPage />)
 
     expect(await screen.findByText('Y2K Chrome...')).toBeInTheDocument()
     expect(screen.getByText('Retro Sunset...')).toBeInTheDocument()
     expect(screen.queryByText('Y2K Chrome Butterfly Baby Tee')).not.toBeInTheDocument()
-    expect(screen.getByText('1.6')).toBeInTheDocument()
-    expect(screen.getByText('2.1')).toBeInTheDocument()
+    expect(screen.getByText('3.10')).toBeInTheDocument()
+    expect(screen.getByText('2.80')).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: /reached top-n in/i })).not.toBeInTheDocument()
+
+    await user.click(screen.getAllByRole('button', { name: 'Expand' })[0]!)
+    expect(await screen.findByText('1.6 days')).toBeInTheDocument()
   })
 
   it('shows empty-state copy when the list is empty', async () => {
