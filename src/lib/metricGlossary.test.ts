@@ -12,7 +12,7 @@ describe('metricGlossary', () => {
       ageDays: 10,
       deltaViews7d: 12,
     })
-    expect(daysToTopHover(listing)).toContain('First in our top-N on')
+    expect(daysToTopHover(listing)).toContain('Reached top-N on')
     expect(estSalesHover(listing)).toContain('0.10')
     expect(queryHitHover('graphic tee', 3)).toBe('Rank 3 for “graphic tee” at last crawl')
     expect(viewsHover(listing)).toContain('200')

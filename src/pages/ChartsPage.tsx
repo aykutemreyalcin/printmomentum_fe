@@ -110,7 +110,9 @@ export function ChartsPage() {
                   <dt>{t('table.momentum')}</dt>
                   <dd>{formatScore(selected.momentumScore)}</dd>
                   <dt>{t('table.daysToTop')}</dt>
-                  <dd>{formatDays(selected.daysToTop)}</dd>
+                  <dd>
+                    {formatDays(selected.daysToTop)} {t('table.climbDaysUnit')}
+                  </dd>
                   <dt>{t('table.favs')}</dt>
                   <dd>{formatCount(selected.numFavorers)}</dd>
                   <dt>{t('table.views')}</dt>

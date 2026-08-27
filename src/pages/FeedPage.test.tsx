@@ -115,7 +115,7 @@ describe('FeedPage', () => {
 
     renderWithApp(<FeedPage />)
 
-    await user.type(screen.getByLabelText('Max days to top'), '7')
+    await user.type(screen.getByLabelText('Max reached top-N in (days)'), '7')
 
     await waitFor(() => {
       expect(fetchMock.mock.calls.some((call) => String(call[0]).includes('maxDaysToTop=7'))).toBe(true)

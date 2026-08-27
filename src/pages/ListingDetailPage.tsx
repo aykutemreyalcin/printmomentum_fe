@@ -123,7 +123,11 @@ export function ListingDetailPage() {
             <div className="detail-grid">
               <Metric
                 label={t('detail.metric.daysToTop')}
-                value={formatDays(listing.daysToTop)}
+                value={
+                  listing.daysToTop == null
+                    ? '—'
+                    : `${formatDays(listing.daysToTop)} ${t('table.climbDaysUnit')}`
+                }
                 hint={glossary.daysToTopHover(listing)}
               />
               <Metric
