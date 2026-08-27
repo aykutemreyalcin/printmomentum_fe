@@ -19,10 +19,11 @@ export function useListings(
   const preset = query.preset
   const shopId = query.shopId
   const bestseller = query.bestseller
+  const momentumPeriod = query.momentumPeriod ?? 'weekly'
   const pageIndex = pagination.pageIndex
   const pageSize = pagination.pageSize
   const [attempt, setAttempt] = useState(0)
-  const requestKey = `${source}|${maxDaysToTop ?? ''}|${minScore ?? ''}|${q ?? ''}|${preset ?? ''}|${shopId ?? ''}|${bestseller ? '1' : ''}|${pageIndex}|${pageSize}|${attempt}`
+  const requestKey = `${source}|${maxDaysToTop ?? ''}|${minScore ?? ''}|${q ?? ''}|${preset ?? ''}|${shopId ?? ''}|${bestseller ? '1' : ''}|${momentumPeriod}|${pageIndex}|${pageSize}|${attempt}`
   const [result, setResult] = useState<FeedResult>({
     key: '',
     page: null,
@@ -42,6 +43,7 @@ export function useListings(
             preset,
             shopId,
             bestseller,
+            momentumPeriod,
             page: pageIndex,
             size: pageSize,
           })
@@ -79,6 +81,7 @@ export function useListings(
     preset,
     shopId,
     bestseller,
+    momentumPeriod,
     pageIndex,
     pageSize,
     attempt,

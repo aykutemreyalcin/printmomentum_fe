@@ -147,6 +147,7 @@ export type TopChartResponse = {
 export type TopChartQuery = {
   limit?: number
   snapshotLimit?: number
+  momentumPeriod?: MomentumPeriod
 }
 
 export type FeedPreset =
@@ -155,6 +156,8 @@ export type FeedPreset =
   | 'created-7d'
   | 'reviewed-24h'
   | 'climbing'
+
+export type MomentumPeriod = 'daily' | 'weekly' | 'monthly'
 
 export type ListingsQuery = {
   page?: number
@@ -165,6 +168,7 @@ export type ListingsQuery = {
   shopId?: number
   preset?: FeedPreset | string
   bestseller?: boolean
+  momentumPeriod?: MomentumPeriod
 }
 
 export type ListingDetailQuery = {

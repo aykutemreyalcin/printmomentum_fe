@@ -1,8 +1,9 @@
 import { useSearchParams } from 'react-router'
-import type { ListingsQuery } from '../api/types'
+import type { ListingsQuery, MomentumPeriod } from '../api/types'
 import { useDebouncedValue } from './useDebouncedValue'
 
 const SEARCH_DEBOUNCE_MS = 300
+const DEFAULT_MOMENTUM_PERIOD: MomentumPeriod = 'weekly'
 
 export function useFeedFilters() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -12,6 +13,7 @@ export function useFeedFilters() {
   const preset = searchParams.get('preset') ?? ''
   const shopId = searchParams.get('shopId') ?? ''
   const bestseller = searchParams.get('bestseller') === 'true'
+  const momentumPeriod = parseMomentumPeriod(searchParams.get('momentumPeriod'))
   const debouncedQ = useDebouncedValue(q, SEARCH_DEBOUNCE_MS)
 
   return {
@@ -21,13 +23,16 @@ export function useFeedFilters() {
     preset,
     shopId,
     bestseller,
-    query: toListingsQuery(maxDaysToTop, minScore, debouncedQ, preset, shopId, bestseller),
+    momentumPeriod,
+    query: toListingsQuery(maxDaysToTop, minScore, debouncedQ, preset, shopId, bestseller, momentumPeriod),
     setMaxDaysToTop: (value: string) => patchSearchParams(setSearchParams, { maxDaysToTop: value }),
     setMinScore: (value: string) => patchSearchParams(setSearchParams, { minScore: value }),
     setQ: (value: string) => patchSearchParams(setSearchParams, { q: value }),
     setPreset: (value: string) => patchSearchParams(setSearchParams, { preset: value }),
     setShopId: (value: string) => patchSearchParams(setSearchParams, { shopId: value }),
     setBestseller: (value: boolean) => patchSearchParams(setSearchParams, { bestseller: value ? 'true' : '' }),
+    setMomentumPeriod: (value: MomentumPeriod) =>
+      patchSearchParams(setSearchParams, { momentumPeriod: value === DEFAULT_MOMENTUM_PERIOD ? '' : value }),
   }
 }
 
@@ -38,6 +43,7 @@ function toListingsQuery(
   preset: string,
   shopId: string,
   bestseller: boolean,
+  momentumPeriod: MomentumPeriod,
 ): ListingsQuery {
   return {
     maxDaysToTop: parseOptionalNumber(maxDaysToTop),
@@ -46,9 +52,17 @@ function toListingsQuery(
     preset: preset === '' ? undefined : preset,
     shopId: parseOptionalNumber(shopId),
     bestseller: bestseller ? true : undefined,
+    momentumPeriod,
     page: 0,
     size: 100,
   }
+}
+
+function parseMomentumPeriod(value: string | null): MomentumPeriod {
+  if (value === 'daily' || value === 'weekly' || value === 'monthly') {
+    return value
+  }
+  return DEFAULT_MOMENTUM_PERIOD
 }
 
 function parseOptionalNumber(value: string): number | undefined {
