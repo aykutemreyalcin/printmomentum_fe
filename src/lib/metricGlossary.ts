@@ -74,7 +74,7 @@ export function createMetricGlossary(t: Translate) {
 /** @deprecated use createMetricGlossary */
 export const METRIC_COPY = {
   momentum: '1/daysToTop + recency + Δfav (formula does not use views)',
-  daysToTop: 'Days from first seen to first time in our top-N',
+  daysToTop: 'Days from Etsy listing open until first seen in our top-N',
   age: 'Age from the original Etsy created date',
   estSales: 'reviews30d / 0.10. Always an estimate, not a sale count.',
   lastReview: 'Last public review · purchase floor, not last sale',

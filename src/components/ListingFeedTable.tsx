@@ -599,7 +599,7 @@ function ListingDetailPanel({
           </span>
           <MetricTip title={glossary.daysToTopHover(listing)}>
             <span>
-              {formatDays(listing.daysToTop)} {t('table.daysToTop').toLowerCase()}
+              {t('table.reachedTopNInSummary', { days: formatDays(listing.daysToTop) })}
             </span>
           </MetricTip>
           <MetricTip title={glossary.momentum}>
