@@ -3,7 +3,7 @@ import { FeedFilters } from '../components/FeedFilters'
 import { ListingFeedTable, loadFeedPageSize } from '../components/ListingFeedTable'
 import { getHealth } from '../api/client'
 import type { Health } from '../api/types'
-import { useCompare } from '../compare/CompareProvider'
+import { useSelection } from '../selection/SelectionProvider'
 import { useFeedFilters } from '../hooks/useFeedFilters'
 import { useListings } from '../hooks/useListings'
 import { usePageTitle } from '../hooks/usePageTitle'
@@ -16,7 +16,7 @@ import './FeedPage.css'
 export function FeedPage() {
   usePageTitle('title.feed')
   const { t } = useI18n()
-  const { ids: compareIds } = useCompare()
+  const { ids: selectedIds } = useSelection()
   const filters = useFeedFilters()
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: loadFeedPageSize() })
   const [exporting, setExporting] = useState<'all' | 'selected' | null>(null)
@@ -62,7 +62,7 @@ export function FeedPage() {
   const exportDate = new Date().toISOString().slice(0, 10)
   const exportBusy = exporting !== null
   const canExportAll = (page?.total ?? 0) > 0 && !exportBusy
-  const canExportSelected = compareIds.length > 0 && !exportBusy
+  const canExportSelected = selectedIds.length > 0 && !exportBusy
 
   async function exportAll() {
     setExporting('all')
@@ -77,10 +77,10 @@ export function FeedPage() {
   async function exportSelected() {
     setExporting('selected')
     try {
-      const onPage = items.filter((item) => compareIds.includes(item.listingId))
-      const missingIds = compareIds.filter((id) => !onPage.some((item) => item.listingId === id))
+      const onPage = items.filter((item) => selectedIds.includes(item.listingId))
+      const missingIds = selectedIds.filter((id) => !onPage.some((item) => item.listingId === id))
       const fetched = missingIds.length > 0 ? await fetchListingsByIds(missingIds) : []
-      const selected = compareIds
+      const selected = selectedIds
         .map((id) => onPage.find((item) => item.listingId === id) ?? fetched.find((item) => item.listingId === id))
         .filter((item): item is NonNullable<typeof item> => item != null)
       downloadCsv(`printmomentum-feed-selected-${exportDate}.csv`, listingsToCsv(selected))

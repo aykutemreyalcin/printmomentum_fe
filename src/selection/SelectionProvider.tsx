@@ -1,30 +1,26 @@
 import { createContext, useCallback, useContext, useMemo, useState, type PropsWithChildren } from 'react'
-import { useI18n } from '../i18n/I18nProvider'
-import { useToast } from '../components/Toast'
 
-const STORAGE_KEY = 'printmomentum-compare'
+const STORAGE_KEY = 'printmomentum-selected'
 
-type CompareValue = {
+type SelectionValue = {
   ids: number[]
   toggle: (id: number) => void
   clear: () => void
 }
 
-const CompareContext = createContext<CompareValue | null>(null)
+const SelectionContext = createContext<SelectionValue | null>(null)
 
 function readIds(): number[] {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY)
     const parsed = stored ? (JSON.parse(stored) as number[]) : []
-    return parsed.filter((id) => Number.isFinite(id)).slice(0, 2)
+    return parsed.filter((id) => Number.isFinite(id))
   } catch {
     return []
   }
 }
 
-export function CompareProvider({ children }: PropsWithChildren) {
-  const { t } = useI18n()
-  const { showToast } = useToast()
+export function SelectionProvider({ children }: PropsWithChildren) {
   const [ids, setIds] = useState<number[]>(() => readIds())
 
   const persist = useCallback((next: number[]) => {
@@ -39,15 +35,7 @@ export function CompareProvider({ children }: PropsWithChildren) {
   const toggle = useCallback(
     (id: number) => {
       setIds((current) => {
-        let next: number[]
-        if (current.includes(id)) {
-          next = current.filter((item) => item !== id)
-        } else if (current.length >= 2) {
-          showToast(t('compare.max'), 'error')
-          return current
-        } else {
-          next = [...current, id]
-        }
+        const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
         try {
           sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next))
         } catch {
@@ -56,19 +44,19 @@ export function CompareProvider({ children }: PropsWithChildren) {
         return next
       })
     },
-    [showToast, t],
+    [],
   )
 
   const clear = useCallback(() => persist([]), [persist])
 
   const value = useMemo(() => ({ ids, toggle, clear }), [ids, toggle, clear])
-  return <CompareContext.Provider value={value}>{children}</CompareContext.Provider>
+  return <SelectionContext.Provider value={value}>{children}</SelectionContext.Provider>
 }
 
-export function useCompare(): CompareValue {
-  const context = useContext(CompareContext)
+export function useSelection(): SelectionValue {
+  const context = useContext(SelectionContext)
   if (!context) {
-    throw new Error('useCompare must be used within CompareProvider')
+    throw new Error('useSelection must be used within SelectionProvider')
   }
   return context
 }

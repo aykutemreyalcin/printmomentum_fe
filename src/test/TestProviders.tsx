@@ -2,7 +2,7 @@ import type { PropsWithChildren, ReactElement } from 'react'
 import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { AuthProvider } from '../auth/AuthProvider'
-import { CompareProvider } from '../compare/CompareProvider'
+import { SelectionProvider } from '../selection/SelectionProvider'
 import { FavoritesCountProvider } from '../favorites/FavoritesCountProvider'
 import { I18nProvider } from '../i18n/I18nProvider'
 import { AppTheme } from '../theme/AppTheme'
@@ -20,9 +20,9 @@ export function TestProviders({
           <ToastProvider>
             <AuthProvider>
               <FavoritesCountProvider>
-                <CompareProvider>
+                <SelectionProvider>
                   <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
-                </CompareProvider>
+                </SelectionProvider>
               </FavoritesCountProvider>
             </AuthProvider>
           </ToastProvider>

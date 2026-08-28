@@ -200,10 +200,18 @@
   cursor: help;
 }
 
-.listing-compare-check {
+.listing-row-lead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.listing-select-check {
   width: 16px;
   height: 16px;
+  margin: 0;
   cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .feed {

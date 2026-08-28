@@ -2,7 +2,7 @@ import { AuthProvider } from './auth/AuthProvider'
 import { AppRoutes } from './AppRoutes'
 import { AppTheme } from './theme/AppTheme'
 import { ToastProvider } from './components/Toast'
-import { CompareProvider } from './compare/CompareProvider'
+import { SelectionProvider } from './selection/SelectionProvider'
 import { FavoritesCountProvider } from './favorites/FavoritesCountProvider'
 import { I18nProvider } from './i18n/I18nProvider'
 import { ThemeModeProvider } from './theme/ThemeModeProvider'
@@ -18,11 +18,11 @@ export default function App() {
           <ToastProvider>
             <AuthProvider>
               <FavoritesCountProvider>
-                <CompareProvider>
+                <SelectionProvider>
                   <BrowserRouter basename={routerBasename}>
                     <AppRoutes />
                   </BrowserRouter>
-                </CompareProvider>
+                </SelectionProvider>
               </FavoritesCountProvider>
             </AuthProvider>
           </ToastProvider>
