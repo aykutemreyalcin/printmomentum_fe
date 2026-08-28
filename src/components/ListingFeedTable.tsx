@@ -2,6 +2,7 @@ import Tooltip from '@mui/material/Tooltip'
 import { Link } from 'react-router'
 import {
   MaterialReactTable,
+  MRT_ExpandButton,
   useMaterialReactTable,
   type MRT_ColumnDef,
   type MRT_ColumnOrderState,
@@ -10,7 +11,7 @@ import {
 } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 import type { ListingFeedItem } from '../api/types'
-import { useCompare } from '../compare/CompareProvider'
+import { useSelection } from '../selection/SelectionProvider'
 import { useI18n, type Translate } from '../i18n/I18nProvider'
 import { formatAgeDays, formatCount, formatDays, formatDelta, formatMoney, formatScore, formatShortDate } from '../lib/format'
 import { createMetricGlossary } from '../lib/metricGlossary'
@@ -39,12 +40,11 @@ type Props = {
 }
 
 const VISIBILITY_KEY = 'printmomentum-table-columns-feed-v4'
-const ORDER_KEY = 'printmomentum-table-order-feed-v3'
+const ORDER_KEY = 'printmomentum-table-order-feed-v4'
 const PAGE_SIZE_KEY = 'printmomentum-table-pagesize-feed-v2'
 
 const DEFAULT_ORDER = [
   'mrt-row-expand',
-  'compare',
   'favorite',
   'rank',
   'image',
@@ -102,20 +102,20 @@ export function ListingFeedTable({
 }: Props) {
   const { t } = useI18n()
   const glossary = useMemo(() => createMetricGlossary(t), [t])
-  const { ids: compareIds, toggle: toggleCompare } = useCompare()
+  const { ids: selectedIds, toggle: toggleSelected } = useSelection()
   const resolvedEmpty = emptyMessage ?? t('feed.emptyFilters')
   const ranked = useMemo(() => withRanks(items), [items])
   const momentumMax = Math.max(...ranked.map((item) => item.momentumScore ?? 0), 0.01)
   const columns = useMemo(
-    () => listingColumns(momentumMax, onToggleFavorite, t, glossary, compareIds, toggleCompare),
-    [momentumMax, onToggleFavorite, t, glossary, compareIds, toggleCompare],
+    () => listingColumns(momentumMax, onToggleFavorite, t, glossary),
+    [momentumMax, onToggleFavorite, t, glossary],
   )
 
   const [columnVisibility, setColumnVisibility] = useState<MRT_VisibilityState>(() => ({
     ...DEFAULT_VISIBILITY,
     ...loadJson<MRT_VisibilityState>(VISIBILITY_KEY, {}),
   }))
-  const [columnOrder, setColumnOrder] = useState<MRT_ColumnOrderState>(loadJson(ORDER_KEY, DEFAULT_ORDER))
+  const [columnOrder, setColumnOrder] = useState<MRT_ColumnOrderState>(() => loadColumnOrder())
   const pagination = useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize])
 
   useEffect(() => saveJson(VISIBILITY_KEY, columnVisibility), [columnVisibility])
@@ -155,7 +155,29 @@ export function ListingFeedTable({
       density: 'compact',
       showGlobalFilter: true,
       showColumnFilters: false,
-      columnPinning: { left: ['mrt-row-expand', 'compare', 'favorite', 'rank', 'image'] },
+      columnPinning: { left: ['mrt-row-expand', 'favorite', 'rank', 'image'] },
+    },
+    displayColumnDefOptions: {
+      'mrt-row-expand': {
+        size: 68,
+        grow: false,
+        enableHiding: false,
+        enableColumnOrdering: false,
+        Header: () => null,
+        Cell: ({ row, table, staticRowIndex }) => (
+          <div className="listing-row-lead">
+            <input
+              type="checkbox"
+              className="listing-select-check"
+              checked={selectedIds.includes(row.original.listingId)}
+              onChange={() => toggleSelected(row.original.listingId)}
+              aria-label={t('selection.select')}
+              onClick={(event) => event.stopPropagation()}
+            />
+            <MRT_ExpandButton row={row} table={table} staticRowIndex={staticRowIndex} />
+          </div>
+        ),
+      },
     },
     state: {
       isLoading: loading,
@@ -261,28 +283,8 @@ function listingColumns(
   onToggleFavorite: (listing: ListingFeedItem) => void | Promise<void>,
   t: Translate,
   glossary: ReturnType<typeof createMetricGlossary>,
-  compareIds: number[],
-  toggleCompare: (id: number) => void,
 ): MRT_ColumnDef<RankedListing>[] {
   return [
-    {
-      id: 'compare',
-      header: t('table.compare'),
-      size: 56,
-      enableColumnFilter: false,
-      enableSorting: false,
-      enableHiding: false,
-      Cell: ({ row }) => (
-        <input
-          type="checkbox"
-          className="listing-compare-check"
-          checked={compareIds.includes(row.original.listingId)}
-          onChange={() => toggleCompare(row.original.listingId)}
-          aria-label={t('compare.select')}
-          onClick={(event) => event.stopPropagation()}
-        />
-      ),
-    },
     {
       id: 'favorite',
       header: t('table.fav'),
@@ -693,6 +695,12 @@ function shouldIgnoreRowExpandClick(target: EventTarget | null): boolean {
 
 function apply<T>(updater: MRT_Updater<T>, previous: T): T {
   return typeof updater === 'function' ? (updater as (value: T) => T)(previous) : updater
+}
+
+function loadColumnOrder(): MRT_ColumnOrderState {
+  const stored = loadJson<MRT_ColumnOrderState>(ORDER_KEY, DEFAULT_ORDER)
+  const sanitized = stored.filter((id) => id !== 'compare')
+  return sanitized.length > 0 ? sanitized : DEFAULT_ORDER
 }
 
 function loadJson<T>(key: string, fallback: T): T {

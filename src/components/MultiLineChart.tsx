@@ -55,7 +55,7 @@ export function MultiLineChart({
           />
         ))}
       {series.map((item) => {
-        const active = focusId == null || focusId === item.id
+        const dimmed = focusId != null && focusId !== item.id
         const polyline = pointsToPolyline(
           item.points,
           WIDTH,
@@ -69,11 +69,11 @@ export function MultiLineChart({
         const isSelected = selectedId === item.id
         const isHovered = hoveredId === item.id
         return (
-          <g key={item.id} opacity={active ? 1 : 0.12}>
+          <g key={item.id} opacity={dimmed ? 0.48 : 1}>
             <polyline
               fill="none"
               stroke={item.color}
-              strokeWidth={isSelected ? 3.5 : isHovered ? 2.8 : 1.6}
+              strokeWidth={isSelected ? 3.5 : isHovered ? 2.8 : dimmed ? 1.8 : 2.2}
               strokeLinecap="round"
               strokeLinejoin="round"
               points={polyline}

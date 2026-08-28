@@ -4,7 +4,6 @@ import { useAuth } from '../auth/AuthProvider'
 import { useFavoritesCount } from '../favorites/FavoritesCountProvider'
 import { useI18n } from '../i18n/I18nProvider'
 import { ApiStatus } from './ApiStatus'
-import { CompareBar } from './CompareBar'
 import { ShellControls } from './ShellControls'
 import './Layout.css'
 
@@ -103,8 +102,6 @@ export function Layout() {
         </NavLink>
         {isAdmin && <NavLink to="/account/members">{t('nav.members')}</NavLink>}
       </nav>
-
-      <CompareBar />
 
       <main className="shell-main">
         <Outlet />
