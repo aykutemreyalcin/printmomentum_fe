@@ -92,6 +92,7 @@ export function Layout() {
           {t('nav.feed')}
         </NavLink>
         <NavLink to="/charts">{t('nav.charts')}</NavLink>
+        <NavLink to="/niches">{t('nav.niches')}</NavLink>
         <NavLink to="/favorites" className="shell-nav-favorites">
           {t('nav.favorites')}
           {favoritesCount != null && favoritesCount > 0 ? (

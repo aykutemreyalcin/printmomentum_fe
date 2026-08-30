@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router'
-import type { ListingsQuery, MomentumPeriod } from '../api/types'
+import type { ListingsQuery, MomentumPeriod, NicheWindowState } from '../api/types'
 import { useDebouncedValue } from './useDebouncedValue'
 
 const SEARCH_DEBOUNCE_MS = 300
@@ -13,6 +13,8 @@ export function useFeedFilters() {
   const preset = searchParams.get('preset') ?? ''
   const shopId = searchParams.get('shopId') ?? ''
   const bestseller = searchParams.get('bestseller') === 'true'
+  const nicheSlug = searchParams.get('nicheSlug') ?? ''
+  const nicheWindow = parseNicheWindow(searchParams.get('nicheWindow'))
   const momentumPeriod = parseMomentumPeriod(searchParams.get('momentumPeriod'))
   const debouncedQ = useDebouncedValue(q, SEARCH_DEBOUNCE_MS)
 
@@ -23,14 +25,19 @@ export function useFeedFilters() {
     preset,
     shopId,
     bestseller,
+    nicheSlug,
+    nicheWindow,
     momentumPeriod,
-    query: toListingsQuery(maxDaysToTop, minScore, debouncedQ, preset, shopId, bestseller, momentumPeriod),
+    query: toListingsQuery(maxDaysToTop, minScore, debouncedQ, preset, shopId, bestseller, nicheSlug, nicheWindow, momentumPeriod),
     setMaxDaysToTop: (value: string) => patchSearchParams(setSearchParams, { maxDaysToTop: value }),
     setMinScore: (value: string) => patchSearchParams(setSearchParams, { minScore: value }),
     setQ: (value: string) => patchSearchParams(setSearchParams, { q: value }),
     setPreset: (value: string) => patchSearchParams(setSearchParams, { preset: value }),
     setShopId: (value: string) => patchSearchParams(setSearchParams, { shopId: value }),
     setBestseller: (value: boolean) => patchSearchParams(setSearchParams, { bestseller: value ? 'true' : '' }),
+    setNicheSlug: (value: string) => patchSearchParams(setSearchParams, { nicheSlug: value }),
+    setNicheWindow: (value: NicheWindowState | '') =>
+      patchSearchParams(setSearchParams, { nicheWindow: value }),
     setMomentumPeriod: (value: MomentumPeriod) =>
       patchSearchParams(setSearchParams, { momentumPeriod: value === DEFAULT_MOMENTUM_PERIOD ? '' : value }),
   }
@@ -43,6 +50,8 @@ function toListingsQuery(
   preset: string,
   shopId: string,
   bestseller: boolean,
+  nicheSlug: string,
+  nicheWindow: NicheWindowState | '',
   momentumPeriod: MomentumPeriod,
 ): ListingsQuery {
   return {
@@ -52,6 +61,8 @@ function toListingsQuery(
     preset: preset === '' ? undefined : preset,
     shopId: parseOptionalNumber(shopId),
     bestseller: bestseller ? true : undefined,
+    nicheSlug: nicheSlug === '' ? undefined : nicheSlug,
+    nicheWindow: nicheWindow === '' ? undefined : nicheWindow,
     momentumPeriod,
     page: 0,
     size: 100,
@@ -63,6 +74,13 @@ function parseMomentumPeriod(value: string | null): MomentumPeriod {
     return value
   }
   return DEFAULT_MOMENTUM_PERIOD
+}
+
+function parseNicheWindow(value: string | null): NicheWindowState | '' {
+  if (value === 'OPEN' || value === 'CLOSING' || value === 'CLOSED' || value === 'LOW_DATA') {
+    return value
+  }
+  return ''
 }
 
 function parseOptionalNumber(value: string): number | undefined {

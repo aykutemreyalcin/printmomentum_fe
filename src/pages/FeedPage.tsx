@@ -22,8 +22,8 @@ export function FeedPage() {
   const [exporting, setExporting] = useState<'all' | 'selected' | null>(null)
   const filterKey = useMemo(
     () =>
-      `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}|${filters.momentumPeriod}`,
-    [filters.maxDaysToTop, filters.minScore, filters.q, filters.preset, filters.bestseller, filters.momentumPeriod],
+      `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}|${filters.nicheSlug}|${filters.nicheWindow}|${filters.momentumPeriod}`,
+    [filters.maxDaysToTop, filters.minScore, filters.q, filters.preset, filters.bestseller, filters.nicheSlug, filters.nicheWindow, filters.momentumPeriod],
   )
   useEffect(() => {
     setPagination((current) => ({ ...current, pageIndex: 0 }))
@@ -52,7 +52,7 @@ export function FeedPage() {
 
   const indexEmpty = (health?.indexedListings ?? 0) === 0
   const filtersOn = Boolean(
-    filters.q || filters.preset || filters.bestseller || filters.maxDaysToTop || filters.minScore,
+    filters.q || filters.preset || filters.bestseller || filters.maxDaysToTop || filters.minScore || filters.nicheSlug || filters.nicheWindow,
   )
   const emptyMessage =
     indexEmpty && !filtersOn
@@ -132,11 +132,15 @@ export function FeedPage() {
         minScore={filters.minScore}
         preset={filters.preset}
         bestseller={filters.bestseller}
+        nicheSlug={filters.nicheSlug}
+        nicheWindow={filters.nicheWindow}
         momentumPeriod={filters.momentumPeriod}
         onMaxDaysToTop={filters.setMaxDaysToTop}
         onMinScore={filters.setMinScore}
         onPreset={filters.setPreset}
         onBestseller={filters.setBestseller}
+        onNicheSlug={filters.setNicheSlug}
+        onNicheWindow={filters.setNicheWindow}
         onMomentumPeriod={filters.setMomentumPeriod}
       />
 

@@ -1,0 +1,103 @@
+.niche-detail-loading {
+  padding: 16px 0;
+}
+
+.niche-detail-feed-link {
+  margin-left: auto;
+}
+
+.niche-detail-card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.niche-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.niche-detail-head h2 {
+  margin-bottom: 8px;
+}
+
+.niche-detail-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.niche-detail-metrics div {
+  display: grid;
+  gap: 4px;
+}
+
+.niche-detail-metrics dt {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.niche-detail-metrics dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.niche-related,
+.niche-top-listings {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.niche-related h3,
+.niche-top-listings h3 {
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.niche-related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.niche-related-chip {
+  padding: 6px 10px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.niche-top-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.niche-top-item {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 12px;
+  align-items: center;
+  color: var(--ink);
+}
+
+.niche-top-item img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--hair);
+}
+
+.niche-top-item p {
+  margin: 0 0 4px;
+  font-weight: 600;
+}

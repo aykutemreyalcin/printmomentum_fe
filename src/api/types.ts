@@ -168,7 +168,83 @@ export type ListingsQuery = {
   shopId?: number
   preset?: FeedPreset | string
   bestseller?: boolean
+  nicheSlug?: string
+  nicheWindow?: NicheWindowState
   momentumPeriod?: MomentumPeriod
+}
+
+export type NicheWindowState = 'OPEN' | 'CLOSING' | 'CLOSED' | 'LOW_DATA'
+
+export type NicheTopListing = {
+  listingId: number
+  title: string
+  imageUrl: string | null
+  etsyUrl: string
+  momentumScore: number | null
+}
+
+export type NicheTermItem = {
+  slug: string
+  label: string
+  window: NicheWindowState
+  listingCount: number
+  newEntrants14d: number
+  cloneDensity7d: number | null
+  breakInRate: number | null
+  incumbentAgeDays: number | null
+  entrantMomentum: number | null
+  etsyCount: number | null
+  windowComputedAt: string | null
+  topListing: NicheTopListing | null
+}
+
+export type NichePage = {
+  items: NicheTermItem[]
+  page: number
+  size: number
+  total: number
+}
+
+export type NicheSnapshotItem = {
+  observedDay: string
+  window: NicheWindowState
+  listingCount: number
+  newEntrants14d: number
+  cloneDensity7d: number | null
+  breakInRate: number | null
+}
+
+export type NicheDetail = {
+  slug: string
+  label: string
+  window: NicheWindowState
+  listingCount: number
+  newEntrants14d: number
+  cloneDensity7d: number | null
+  breakInRate: number | null
+  incumbentAgeDays: number | null
+  entrantMomentum: number | null
+  etsyCount: number | null
+  windowComputedAt: string | null
+  history: NicheSnapshotItem[]
+  topListings: NicheTopListing[]
+  relatedTerms: NicheTermItem[]
+}
+
+export type NicheStats = {
+  open: number
+  closing: number
+  closed: number
+  lowData: number
+  total: number
+  computedAt: string | null
+}
+
+export type NichesQuery = {
+  window?: NicheWindowState | ''
+  sort?: 'momentum' | 'listings' | 'clone' | 'entrants'
+  page?: number
+  size?: number
 }
 
 export type ListingDetailQuery = {

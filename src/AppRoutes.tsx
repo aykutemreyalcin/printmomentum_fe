@@ -12,6 +12,8 @@ import { LoginPage } from './pages/LoginPage'
 import { MembersPage } from './pages/MembersPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { NicheDetailPage } from './pages/NicheDetailPage'
+import { NicheWindowsPage } from './pages/NicheWindowsPage'
 import { ShopPage } from './pages/ShopPage'
 
 export function AppRoutes() {
@@ -23,6 +25,8 @@ export function AppRoutes() {
           <Route index element={<FeedPage />} />
           <Route path="favorites" element={<FavoritesPage />} />
           <Route path="charts" element={<ChartsPage />} />
+          <Route path="niches" element={<NicheWindowsPage />} />
+          <Route path="niches/:slug" element={<NicheDetailPage />} />
           <Route path="listings/:listingId" element={<ListingDetailPage />} />
           <Route path="shops/:shopId" element={<ShopPage />} />
           <Route path="account/security/change-password" element={<ChangePasswordPage />} />
