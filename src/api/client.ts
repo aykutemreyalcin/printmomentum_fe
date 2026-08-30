@@ -11,6 +11,10 @@ import type {
   Shop,
   TopChartQuery,
   TopChartResponse,
+  NicheDetail,
+  NichePage,
+  NichesQuery,
+  NicheStats,
 } from './types'
 
 const API_BASE = '/api'
@@ -92,8 +96,27 @@ export async function getListings(query: ListingsQuery = {}): Promise<ListingPag
     shopId: query.shopId,
     preset: query.preset,
     bestseller: query.bestseller,
+    nicheSlug: query.nicheSlug,
+    nicheWindow: query.nicheWindow,
     momentumPeriod: query.momentumPeriod,
   })}`)
+}
+
+export async function getNiches(query: NichesQuery = {}): Promise<NichePage> {
+  return request(`/v1/niches${toQuery({
+    window: query.window,
+    sort: query.sort,
+    page: query.page,
+    size: query.size,
+  })}`)
+}
+
+export async function getNicheStats(): Promise<NicheStats> {
+  return request('/v1/niches/stats')
+}
+
+export async function getNicheDetail(slug: string): Promise<NicheDetail> {
+  return request(`/v1/niches/${encodeURIComponent(slug)}`)
 }
 
 export async function getFavorites(query: Pick<ListingsQuery, 'page' | 'size'> = {}): Promise<ListingPage> {

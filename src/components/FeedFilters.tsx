@@ -1,4 +1,4 @@
-import type { FeedPreset, MomentumPeriod } from '../api/types'
+import type { FeedPreset, MomentumPeriod, NicheWindowState } from '../api/types'
 import { useI18n } from '../i18n/I18nProvider'
 import type { MessageKey } from '../i18n/messages'
 import './FeedFilters.css'
@@ -17,16 +17,27 @@ const MOMENTUM_PERIODS: { id: MomentumPeriod; key: MessageKey }[] = [
   { id: 'monthly', key: 'filters.momentumMonthly' },
 ]
 
+const NICHE_WINDOWS: Array<{ id: NicheWindowState | ''; key: MessageKey }> = [
+  { id: '', key: 'filters.nicheWindowAll' },
+  { id: 'OPEN', key: 'niches.window.OPEN' },
+  { id: 'CLOSING', key: 'niches.window.CLOSING' },
+  { id: 'CLOSED', key: 'niches.window.CLOSED' },
+]
+
 type Props = {
   maxDaysToTop: string
   minScore: string
   preset: string
   bestseller: boolean
+  nicheSlug: string
+  nicheWindow: NicheWindowState | ''
   momentumPeriod: MomentumPeriod
   onMaxDaysToTop: (value: string) => void
   onMinScore: (value: string) => void
   onPreset: (value: string) => void
   onBestseller: (value: boolean) => void
+  onNicheSlug: (value: string) => void
+  onNicheWindow: (value: NicheWindowState | '') => void
   onMomentumPeriod: (value: MomentumPeriod) => void
 }
 
@@ -35,11 +46,15 @@ export function FeedFilters({
   minScore,
   preset,
   bestseller,
+  nicheSlug,
+  nicheWindow,
   momentumPeriod,
   onMaxDaysToTop,
   onMinScore,
   onPreset,
   onBestseller,
+  onNicheSlug,
+  onNicheWindow,
   onMomentumPeriod,
 }: Props) {
   const { t } = useI18n()
@@ -117,6 +132,30 @@ export function FeedFilters({
               onChange={(event) => onMinScore(event.target.value)}
             />
           </label>
+          <label>
+            <span className="label">{t('filters.nicheSlug')}</span>
+            <input
+              type="text"
+              value={nicheSlug}
+              onChange={(event) => onNicheSlug(event.target.value)}
+              placeholder={t('filters.nicheSlugPlaceholder')}
+            />
+          </label>
+        </div>
+        <div className="feed-filter-row">
+          <div className="feed-presets" role="group" aria-label={t('filters.nicheWindow')}>
+            {NICHE_WINDOWS.map((item) => (
+              <button
+                key={item.id || 'all'}
+                type="button"
+                className={['feed-preset', nicheWindow === item.id && 'is-on'].filter(Boolean).join(' ')}
+                aria-pressed={nicheWindow === item.id}
+                onClick={() => onNicheWindow(item.id)}
+              >
+                {t(item.key)}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
     </form>

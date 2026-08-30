@@ -96,6 +96,9 @@ export function stubApi(
     detailOk?: boolean
     detailStatus?: number
     topChart?: unknown[]
+    niches?: unknown[]
+    nicheStats?: unknown
+    nicheDetail?: unknown
     shopOk?: boolean
     shopStatus?: number
   } = {},
@@ -222,6 +225,61 @@ export function stubApi(
                   indexedListingCount: items.length,
                 })
               : { title: 'Not Found', status: shopStatus, detail: 'shop not found' },
+        }
+      }
+      if (url.includes('/v1/niches/stats')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () =>
+            options.nicheStats ?? { open: 1, closing: 0, closed: 0, lowData: 0, total: 1, computedAt: null },
+        }
+      }
+      const nicheDetailMatch = url.match(/\/v1\/niches\/([^/?]+)/)
+      if (nicheDetailMatch && !url.includes('/listings')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () =>
+            options.nicheDetail ?? {
+              slug: nicheDetailMatch[1],
+              label: 'dolly parton',
+              window: 'OPEN',
+              listingCount: 3,
+              newEntrants14d: 2,
+              cloneDensity7d: 0.1,
+              breakInRate: 0.5,
+              incumbentAgeDays: 14,
+              entrantMomentum: 0.7,
+              etsyCount: 1200,
+              windowComputedAt: '2026-08-30T12:00:00Z',
+              history: [],
+              topListings: [listingFixture({ listingId: 9101 })],
+              relatedTerms: [],
+            },
+        }
+      }
+      if (url.includes('/v1/niches')) {
+        const niches = options.niches ?? [
+          {
+            slug: 'dolly-parton',
+            label: 'dolly parton',
+            window: 'OPEN',
+            listingCount: 3,
+            newEntrants14d: 2,
+            cloneDensity7d: 0.1,
+            breakInRate: 0.5,
+            incumbentAgeDays: 14,
+            entrantMomentum: 0.7,
+            etsyCount: 1200,
+            windowComputedAt: '2026-08-30T12:00:00Z',
+            topListing: listingFixture({ listingId: 9101 }),
+          },
+        ]
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ items: niches, page: 0, size: 100, total: niches.length }),
         }
       }
       if (url.includes('/v1/listings/top-chart')) {

@@ -1,0 +1,124 @@
+.niches-page {
+  width: 100%;
+}
+
+.niches-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.niches-head h2 {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.niches-copy {
+  margin-top: 6px;
+  max-width: 60ch;
+}
+
+.niches-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.niches-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.niches-window-btn {
+  padding: 7px 12px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.niches-window-btn.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.niche-window-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.niche-window-pill.is-open {
+  background: color-mix(in srgb, #1a9f5c 18%, var(--surface));
+  color: #0d6b3d;
+}
+
+.niche-window-pill.is-closing {
+  background: color-mix(in srgb, #d97706 18%, var(--surface));
+  color: #92400e;
+}
+
+.niche-window-pill.is-closed {
+  background: color-mix(in srgb, #64748b 18%, var(--surface));
+  color: #334155;
+}
+
+.niche-window-pill.is-low-data {
+  background: color-mix(in srgb, var(--muted) 20%, var(--surface));
+  color: var(--muted);
+}
+
+.niches-table-wrap {
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.niches-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.niches-table th,
+.niches-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--hair);
+  vertical-align: top;
+}
+
+.niches-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.niches-term-link {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.niches-etsy {
+  display: block;
+  margin-top: 4px;
+}
+
+.niches-loading,
+.niches-error,
+.niches-empty,
+.niches-meta {
+  margin: 0 0 12px;
+}
+
+.niches-error {
+  color: var(--danger, #b42318);
+}
