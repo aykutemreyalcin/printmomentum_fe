@@ -82,7 +82,7 @@ export function FeedFilters({
 
   const advancedCount = useMemo(() => {
     let count = 0
-    if (['seen-today', 'opened-7d', 'reviewed-24h'].includes(preset)) count += 1
+    if (['seen-today', 'created-7d', 'reviewed-24h'].includes(preset)) count += 1
     if (maxDaysToTop) count += 1
     if (minScore) count += 1
     return count
