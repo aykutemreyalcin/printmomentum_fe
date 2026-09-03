@@ -4,25 +4,21 @@
   margin-bottom: 12px;
 }
 
-.feed-momentum-bar {
+.feed-control-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   padding: 10px 12px;
   background: var(--surface);
   border: 1px solid var(--hair);
   border-radius: 10px;
 }
 
-.feed-section-label {
-  flex: 0 0 auto;
-  min-width: 9rem;
-}
-
 .feed-momentum-segmented {
   display: inline-flex;
-  flex: 1 1 240px;
+  flex: 1 1 220px;
+  min-width: 200px;
   padding: 3px;
   background: var(--canvas);
   border: 1px solid var(--hair);
@@ -32,16 +28,13 @@
 .feed-momentum-segment {
   flex: 1;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   color: var(--muted);
   font: 600 13px/1 var(--sans);
   cursor: pointer;
-  transition:
-    background 120ms var(--ease),
-    color 120ms var(--ease);
 }
 
 .feed-momentum-segment:hover {
@@ -51,29 +44,69 @@
 .feed-momentum-segment.is-on {
   background: var(--primary-soft);
   color: var(--primary);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 8%, transparent);
 }
 
-.feed-filter-bar {
-  display: grid;
-  gap: 8px;
+.feed-search {
+  flex: 1 1 200px;
+  min-width: 180px;
+  padding: 8px 12px;
+  background: var(--canvas);
+  border: 1px solid var(--hair);
+  border-radius: 8px;
 }
 
-.feed-filter-row {
+.feed-search input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 400 14px/1.2 var(--sans);
+}
+
+.feed-search input:focus {
+  outline: none;
+}
+
+.feed-toolbar-btn {
+  position: relative;
+  padding: 8px 12px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--canvas);
+  color: var(--ink);
+  font: 600 13px/1 var(--sans);
+  cursor: pointer;
+}
+
+.feed-toolbar-btn.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.feed-toolbar-group {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.feed-filter-badge {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--surface);
+  font-size: 11px;
+}
+
+.feed-quick-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 12px;
+  gap: 6px;
 }
 
 .feed-presets {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-}
-
-.feed-bestseller-filter {
-  padding-top: 2px;
 }
 
 .feed-preset {
@@ -97,40 +130,36 @@
   background: var(--canvas);
 }
 
-.feed-filters label {
-  display: grid;
-  gap: 6px;
-  min-width: 160px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border: 1px solid var(--hair);
-  border-radius: 8px;
-}
-
-.feed-filters input {
-  width: 100%;
-  padding: 2px 0 0;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
   border: 0;
-  background: transparent;
-  color: var(--ink);
-  font: 400 14px/1.2 var(--sans);
 }
 
-.feed-filters input:focus {
-  outline: none;
-}
-
-@media (max-width: 640px) {
-  .feed-momentum-bar {
+@media (max-width: 900px) {
+  .feed-control-row {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .feed-section-label {
-    min-width: 0;
+  .feed-momentum-segmented,
+  .feed-search {
+    width: 100%;
+    flex-basis: auto;
   }
 
-  .feed-momentum-segmented {
-    flex-basis: 100%;
+  .feed-toolbar-group {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .feed-toolbar-group .feed-toolbar-btn {
+    flex: 1;
   }
 }

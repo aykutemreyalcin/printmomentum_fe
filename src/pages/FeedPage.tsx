@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { FeedFilters } from '../components/FeedFilters'
+import { FeedCardGrid } from '../components/FeedCardGrid'
+import { FeedFilters, type FeedDensity, type FeedViewMode } from '../components/FeedFilters'
 import { ListingFeedTable, loadFeedPageSize } from '../components/ListingFeedTable'
 import { getHealth } from '../api/client'
 import type { Health } from '../api/types'
@@ -10,8 +11,31 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { useI18n } from '../i18n/I18nProvider'
 import { fetchAllListings, fetchListingsByIds } from '../lib/exportListings'
 import { downloadCsv, listingsToCsv } from '../lib/listingsCsv'
-import { formatIstanbulClock } from '../lib/format'
+import { formatCount, formatIstanbulClock } from '../lib/format'
 import './FeedPage.css'
+
+const VIEW_MODE_KEY = 'printmomentum-feed-view'
+const DENSITY_KEY = 'printmomentum-feed-density'
+
+function loadViewMode(): FeedViewMode {
+  try {
+    const stored = localStorage.getItem(VIEW_MODE_KEY)
+    if (stored === 'table' || stored === 'cards') return stored
+  } catch {
+    /* ignore */
+  }
+  return 'table'
+}
+
+function loadDensity(): FeedDensity {
+  try {
+    const stored = localStorage.getItem(DENSITY_KEY)
+    if (stored === 'compact' || stored === 'comfortable') return stored
+  } catch {
+    /* ignore */
+  }
+  return 'compact'
+}
 
 export function FeedPage() {
   usePageTitle('title.feed')
@@ -20,6 +44,8 @@ export function FeedPage() {
   const filters = useFeedFilters()
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: loadFeedPageSize() })
   const [exporting, setExporting] = useState<'all' | 'selected' | null>(null)
+  const [viewMode, setViewMode] = useState<FeedViewMode>(() => loadViewMode())
+  const [density, setDensity] = useState<FeedDensity>(() => loadDensity())
   const filterKey = useMemo(
     () =>
       `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}|${filters.nicheSlug}|${filters.nicheWindow}|${filters.momentumPeriod}`,
@@ -49,6 +75,14 @@ export function FeedPage() {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    localStorage.setItem(VIEW_MODE_KEY, viewMode)
+  }, [viewMode])
+
+  useEffect(() => {
+    localStorage.setItem(DENSITY_KEY, density)
+  }, [density])
 
   const indexEmpty = (health?.indexedListings ?? 0) === 0
   const filtersOn = Boolean(
@@ -89,45 +123,36 @@ export function FeedPage() {
     }
   }
 
+  const insightTime = health?.lastCrawlAt
+    ? formatIstanbulClock(health.lastCrawlAt)
+    : health?.nextCrawlAt
+      ? formatIstanbulClock(health.nextCrawlAt)
+      : null
+
+  const pageCount = Math.max(1, Math.ceil((page?.total ?? 0) / pagination.pageSize))
+  const canPrev = pagination.pageIndex > 0
+  const canNext = pagination.pageIndex + 1 < pageCount
+
   return (
     <div className="feed">
-      <div className="page-toolbar">
+      <div className="page-toolbar feed-toolbar-head">
         <div>
           <h2>{t('feed.title')}</h2>
-          <p className="label page-meta">
-            {loading ? t('feed.loading') : t('feed.listings', { count: page?.total ?? 0 })}
-            <span aria-hidden="true"> · </span>
-            {t('feed.ranked')}
-            {health?.nextCrawlAt ? (
-              <>
-                <span aria-hidden="true"> · </span>
-                {t('feed.nextCrawl', { time: formatIstanbulClock(health.nextCrawlAt) })}
-              </>
-            ) : null}
+          <p className="label feed-insight">
+            {loading
+              ? t('feed.loading')
+              : t('feed.insight', {
+                  count: page?.total ?? 0,
+                  indexed: formatCount(health?.indexedListings ?? 0),
+                  time: insightTime ?? '—',
+                })}
           </p>
         </div>
-        {sample && <p className="feed-sample label">{t('feed.sample')}</p>}
-        <div className="feed-export-group">
-          <button
-            type="button"
-            className="feed-export"
-            disabled={!canExportAll}
-            onClick={() => void exportAll()}
-          >
-            {exporting === 'all' ? t('feed.exporting') : t('feed.exportAll')}
-          </button>
-          <button
-            type="button"
-            className="feed-export"
-            disabled={!canExportSelected}
-            onClick={() => void exportSelected()}
-          >
-            {exporting === 'selected' ? t('feed.exporting') : t('feed.exportSelected')}
-          </button>
-        </div>
+        {sample ? <p className="feed-sample label">{t('feed.sample')}</p> : null}
       </div>
 
       <FeedFilters
+        q={filters.q}
         maxDaysToTop={filters.maxDaysToTop}
         minScore={filters.minScore}
         preset={filters.preset}
@@ -135,29 +160,70 @@ export function FeedPage() {
         nicheSlug={filters.nicheSlug}
         nicheWindow={filters.nicheWindow}
         momentumPeriod={filters.momentumPeriod}
+        viewMode={viewMode}
+        density={density}
+        canExportAll={canExportAll}
+        canExportSelected={canExportSelected}
+        exporting={exporting}
+        onQ={filters.setQ}
         onMaxDaysToTop={filters.setMaxDaysToTop}
         onMinScore={filters.setMinScore}
         onPreset={filters.setPreset}
         onBestseller={filters.setBestseller}
-        onNicheSlug={filters.setNicheSlug}
-        onNicheWindow={filters.setNicheWindow}
+        onClearNiche={filters.clearNiche}
+        onClearNicheWindow={() => filters.setNicheWindow('')}
         onMomentumPeriod={filters.setMomentumPeriod}
+        onViewMode={setViewMode}
+        onDensity={setDensity}
+        onExportAll={() => void exportAll()}
+        onExportSelected={() => void exportSelected()}
       />
 
-      <ListingFeedTable
-        items={items}
-        rowCount={page?.total ?? 0}
-        pageIndex={pagination.pageIndex}
-        pageSize={pagination.pageSize}
-        onPaginationChange={setPagination}
-        loading={loading}
-        error={error}
-        onRetry={retry}
-        search={filters.q}
-        onSearch={filters.setQ}
-        onToggleFavorite={toggleFavorite}
-        emptyMessage={emptyMessage}
-      />
+      {viewMode === 'cards' ? (
+        <>
+          <FeedCardGrid items={items} onToggleFavorite={toggleFavorite} emptyMessage={emptyMessage} />
+          {(page?.total ?? 0) > pagination.pageSize ? (
+            <div className="feed-card-pagination">
+              <button
+                type="button"
+                className="feed-toolbar-btn"
+                disabled={!canPrev || loading}
+                onClick={() => setPagination((current) => ({ ...current, pageIndex: current.pageIndex - 1 }))}
+              >
+                {t('feed.prevPage')}
+              </button>
+              <span className="label">
+                {t('feed.pageOf', { page: pagination.pageIndex + 1, total: pageCount })}
+              </span>
+              <button
+                type="button"
+                className="feed-toolbar-btn"
+                disabled={!canNext || loading}
+                onClick={() => setPagination((current) => ({ ...current, pageIndex: current.pageIndex + 1 }))}
+              >
+                {t('feed.nextPage')}
+              </button>
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <ListingFeedTable
+          items={items}
+          rowCount={page?.total ?? 0}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          onPaginationChange={setPagination}
+          loading={loading}
+          error={error}
+          onRetry={retry}
+          search={filters.q}
+          onSearch={filters.setQ}
+          onToggleFavorite={toggleFavorite}
+          emptyMessage={emptyMessage}
+          hideGlobalFilter
+          density={density}
+        />
+      )}
     </div>
   )
 }

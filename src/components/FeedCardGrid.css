@@ -1,0 +1,73 @@
+.feed-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.feed-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+}
+
+.feed-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.feed-card-rank {
+  font: 700 12px/1 var(--sans);
+  color: var(--muted);
+}
+
+.feed-card-image {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--hair);
+}
+
+.feed-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feed-card h3 {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.feed-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.feed-card h3 a:hover {
+  text-decoration: underline;
+}
+
+.feed-card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 12px;
+}
+
+.feed-card-stats dt {
+  color: var(--muted);
+}
+
+.feed-card-stats dd {
+  font-weight: 600;
+}
+
+.feed-card-empty {
+  padding: 24px 0;
+  color: var(--muted);
+}
