@@ -93,13 +93,23 @@ export function Layout() {
         </NavLink>
         <NavLink to="/charts">{t('nav.charts')}</NavLink>
         <NavLink to="/niches">{t('nav.niches')}</NavLink>
-        <NavLink to="/favorites" className="shell-nav-favorites">
-          {t('nav.favorites')}
-          {favoritesCount != null && favoritesCount > 0 ? (
-            <span className="shell-nav-badge" aria-label={String(favoritesCount)}>
-              {favoritesCount}
-            </span>
-          ) : null}
+        <NavLink
+          to="/favorites"
+          className="shell-nav-favorites"
+          aria-label={
+            favoritesCount != null && favoritesCount > 0
+              ? `${t('nav.favorites')} (${favoritesCount})`
+              : undefined
+          }
+        >
+          <span className="shell-nav-favorites-label">
+            {t('nav.favorites')}
+            {favoritesCount != null && favoritesCount > 0 ? (
+              <span className="shell-nav-badge" aria-hidden="true">
+                {favoritesCount}
+              </span>
+            ) : null}
+          </span>
         </NavLink>
         {isAdmin && <NavLink to="/account/members">{t('nav.members')}</NavLink>}
       </nav>
