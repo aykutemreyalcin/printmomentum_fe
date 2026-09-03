@@ -242,6 +242,7 @@ export type NicheStats = {
 
 export type NichesQuery = {
   window?: NicheWindowState | ''
+  q?: string
   sort?: 'momentum' | 'listings' | 'clone' | 'entrants'
   page?: number
   size?: number

@@ -260,7 +260,9 @@ export function stubApi(
         }
       }
       if (url.includes('/v1/niches')) {
-        const niches = options.niches ?? [
+        const qMatch = url.match(/[?&]q=([^&]+)/)
+        const q = qMatch ? decodeURIComponent(qMatch[1]).toLowerCase() : ''
+        const niches = (options.niches ?? [
           {
             slug: 'dolly-parton',
             label: 'dolly parton',
@@ -275,7 +277,11 @@ export function stubApi(
             windowComputedAt: '2026-08-30T12:00:00Z',
             topListing: listingFixture({ listingId: 9101 }),
           },
-        ]
+        ]).filter((item) => {
+          if (!q) return true
+          const niche = item as { label?: string; slug?: string }
+          return niche.label?.toLowerCase().includes(q) || niche.slug?.toLowerCase().includes(q)
+        })
         return {
           ok: true,
           status: 200,

@@ -21,17 +21,53 @@
   max-width: 60ch;
 }
 
-.niches-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.niches-insight {
+  margin-top: 6px;
 }
 
 .niches-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 16px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+}
+
+.niches-search {
+  flex: 1 1 220px;
+  min-width: 180px;
+  padding: 8px 12px;
+  background: var(--canvas);
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+}
+
+.niches-search input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 400 14px/1.2 var(--sans);
+}
+
+.niches-search input:focus {
+  outline: none;
+}
+
+.niches-window-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.niches-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .niches-window-btn {
