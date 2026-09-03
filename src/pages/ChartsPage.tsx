@@ -5,19 +5,28 @@ import type { TopChartItem } from '../api/types'
 import { MultiLineChart } from '../components/MultiLineChart'
 import { useI18n } from '../i18n/I18nProvider'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { buildChartSeries, type ChartMetric } from '../lib/chartSeries'
+import {
+  buildChartSeries,
+  type ChartMetric,
+  type ChartMode,
+  type ChartWindowDays,
+} from '../lib/chartSeries'
 import { formatCount, formatDays, formatScore } from '../lib/format'
 import './ChartsPage.css'
 
 const TOP_LIMIT = 30
+const DEFAULT_WINDOW_DAYS: ChartWindowDays = 30
+const SNAPSHOT_LIMIT = 60
 
 export function ChartsPage() {
   usePageTitle('title.charts')
-  const { t } = useI18n()
+  const { t, dateLocale, numberLocale } = useI18n()
   const [items, setItems] = useState<TopChartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [metric, setMetric] = useState<ChartMetric>('numFavorers')
+  const [mode, setMode] = useState<ChartMode>('normalized')
+  const [windowDays, setWindowDays] = useState<ChartWindowDays>(DEFAULT_WINDOW_DAYS)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [hoveredId, setHoveredId] = useState<number | null>(null)
 
@@ -25,7 +34,7 @@ export function ChartsPage() {
     let cancelled = false
     setLoading(true)
     setError(null)
-    void getTopChart({ limit: TOP_LIMIT, snapshotLimit: 90, momentumPeriod: 'weekly' })
+    void getTopChart({ limit: TOP_LIMIT, snapshotLimit: SNAPSHOT_LIMIT, momentumPeriod: 'weekly' })
       .then((response) => {
         if (!cancelled) {
           setItems(response.items)
@@ -48,11 +57,19 @@ export function ChartsPage() {
     }
   }, [t])
 
-  const series = useMemo(() => buildChartSeries(items, metric), [items, metric])
+  const series = useMemo(
+    () => buildChartSeries(items, metric, mode, windowDays),
+    [items, metric, mode, windowDays],
+  )
   const selected =
     items.find((item) => item.listingId === selectedId) ??
     items.find((item) => item.listingId === hoveredId) ??
     null
+
+  const chartAriaLabel =
+    mode === 'normalized'
+      ? t('charts.ariaNormalized', { metric: t(`charts.metric.${metric}`), days: windowDays })
+      : t('charts.ariaAbsolute', { metric: t(`charts.metric.${metric}`), days: windowDays })
 
   return (
     <div className="charts-page">
@@ -61,23 +78,51 @@ export function ChartsPage() {
           <h2>{t('charts.title')}</h2>
           <p className="label charts-copy">{t('charts.copy', { count: TOP_LIMIT })}</p>
         </div>
-        <div className="charts-toolbar" role="group" aria-label={t('charts.metricGroup')}>
-          <button
-            type="button"
-            className={['charts-metric', metric === 'numFavorers' && 'is-on'].filter(Boolean).join(' ')}
-            aria-pressed={metric === 'numFavorers'}
-            onClick={() => setMetric('numFavorers')}
-          >
-            {t('charts.metricFavorers')}
-          </button>
-          <button
-            type="button"
-            className={['charts-metric', metric === 'views' && 'is-on'].filter(Boolean).join(' ')}
-            aria-pressed={metric === 'views'}
-            onClick={() => setMetric('views')}
-          >
-            {t('charts.metricViews')}
-          </button>
+        <div className="charts-toolbar">
+          <div className="charts-toolbar-group" role="group" aria-label={t('charts.metricGroup')}>
+            {(['numFavorers', 'views', 'position'] as const).map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={['charts-metric', metric === key && 'is-on'].filter(Boolean).join(' ')}
+                aria-pressed={metric === key}
+                onClick={() => setMetric(key)}
+              >
+                {t(`charts.metric.${key}`)}
+              </button>
+            ))}
+          </div>
+          <div className="charts-toolbar-group" role="group" aria-label={t('charts.modeGroup')}>
+            <button
+              type="button"
+              className={['charts-metric', mode === 'normalized' && 'is-on'].filter(Boolean).join(' ')}
+              aria-pressed={mode === 'normalized'}
+              onClick={() => setMode('normalized')}
+            >
+              {t('charts.modeNormalized')}
+            </button>
+            <button
+              type="button"
+              className={['charts-metric', mode === 'absolute' && 'is-on'].filter(Boolean).join(' ')}
+              aria-pressed={mode === 'absolute'}
+              onClick={() => setMode('absolute')}
+            >
+              {t('charts.modeAbsolute')}
+            </button>
+          </div>
+          <div className="charts-toolbar-group" role="group" aria-label={t('charts.windowGroup')}>
+            {([30, 90] as const).map((days) => (
+              <button
+                key={days}
+                type="button"
+                className={['charts-metric', windowDays === days && 'is-on'].filter(Boolean).join(' ')}
+                aria-pressed={windowDays === days}
+                onClick={() => setWindowDays(days)}
+              >
+                {t('charts.windowDays', { days })}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -90,11 +135,15 @@ export function ChartsPage() {
             <MultiLineChart
               series={series}
               metric={metric}
+              mode={mode}
+              locale={dateLocale}
+              numberLocale={numberLocale}
               selectedId={selectedId}
               hoveredId={hoveredId}
               onSelect={setSelectedId}
               onHover={setHoveredId}
               emptyLabel={t('charts.noData')}
+              ariaLabel={chartAriaLabel}
             />
             <p className="charts-hint">{t('charts.hint')}</p>
           </section>

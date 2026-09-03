@@ -24,6 +24,13 @@
 .charts-toolbar {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 12px;
+}
+
+.charts-toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -119,6 +126,12 @@
   stroke: var(--hair);
   stroke-width: 1;
   opacity: 0.55;
+}
+
+.multi-line-chart-axis {
+  fill: var(--muted);
+  font-size: 11px;
+  font-family: inherit;
 }
 
 .multi-line-chart-line {
