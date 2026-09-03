@@ -5,7 +5,7 @@ import './FeedFiltersDrawer.css'
 
 const DRAWER_PRESETS: { id: FeedPreset; key: MessageKey }[] = [
   { id: 'seen-today', key: 'filters.seenToday' },
-  { id: 'opened-7d', key: 'filters.opened7d' },
+  { id: 'created-7d', key: 'filters.opened7d' },
   { id: 'reviewed-24h', key: 'filters.newReview' },
 ]
 
