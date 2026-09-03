@@ -17,6 +17,8 @@ describe('ChartsPage', () => {
     renderWithApp(<ChartsPage />, '/charts')
 
     expect(await screen.findByRole('heading', { name: 'Top momentum chart' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '% change' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '30d' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('Fast Tee Alpha')).toBeInTheDocument()
 
     const lines = document.querySelectorAll('.multi-line-chart-line')
