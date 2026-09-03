@@ -262,6 +262,10 @@ export function stubApi(
       if (url.includes('/v1/niches')) {
         const qMatch = url.match(/[?&]q=([^&]+)/)
         const q = qMatch ? decodeURIComponent(qMatch[1]).toLowerCase() : ''
+        const pageMatch = url.match(/[?&]page=(\d+)/)
+        const page = pageMatch ? Number.parseInt(pageMatch[1], 10) : 0
+        const sizeMatch = url.match(/[?&]size=(\d+)/)
+        const size = sizeMatch ? Number.parseInt(sizeMatch[1], 10) : 100
         const niches = (options.niches ?? [
           {
             slug: 'dolly-parton',
@@ -282,10 +286,11 @@ export function stubApi(
           const niche = item as { label?: string; slug?: string }
           return niche.label?.toLowerCase().includes(q) || niche.slug?.toLowerCase().includes(q)
         })
+        const slice = niches.slice(page * size, page * size + size)
         return {
           ok: true,
           status: 200,
-          json: async () => ({ items: niches, page: 0, size: 100, total: niches.length }),
+          json: async () => ({ items: slice, page, size, total: niches.length }),
         }
       }
       if (url.includes('/v1/listings/top-chart')) {
