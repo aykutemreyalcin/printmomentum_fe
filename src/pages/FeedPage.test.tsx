@@ -5,8 +5,8 @@ import { FeedPage } from './FeedPage'
 import { renderWithApp } from '../test/renderWithApp'
 import { listingFixture, stubApi } from '../test/stubApi'
 
-async function openOverflowMenu(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(await screen.findByRole('button', { name: 'More actions' }))
+async function openExportMenu(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(await screen.findByRole('button', { name: 'Export' }))
 }
 
 describe('FeedPage', () => {
@@ -44,7 +44,7 @@ describe('FeedPage', () => {
     renderWithApp(<FeedPage />)
 
     expect(await screen.findByText('No printable tees match. Widen filters.')).toBeInTheDocument()
-    await openOverflowMenu(user)
+    await openExportMenu(user)
     expect(screen.getByRole('menuitem', { name: 'Export all' })).toBeDisabled()
     expect(screen.getByRole('menuitem', { name: 'Export selected' })).toBeDisabled()
   })

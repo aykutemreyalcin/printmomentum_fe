@@ -4,7 +4,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import type { MessageKey } from '../i18n/messages'
 import { FeedActiveChips } from './FeedActiveChips'
 import { FeedFiltersDrawer } from './FeedFiltersDrawer'
-import { FeedOverflowMenu } from './FeedOverflowMenu'
+import { FeedExportDropdown } from './FeedExportDropdown'
 import './FeedFilters.css'
 
 const MOMENTUM_PERIODS: { id: MomentumPeriod; key: MessageKey }[] = [
@@ -20,7 +20,6 @@ const QUICK_PRESETS: Array<{ id: FeedPreset | 'bestseller'; key: MessageKey }> =
 ]
 
 export type FeedViewMode = 'table' | 'cards'
-export type FeedDensity = 'compact' | 'comfortable'
 
 type Props = {
   q: string
@@ -32,7 +31,6 @@ type Props = {
   nicheWindow: import('../api/types').NicheWindowState | ''
   momentumPeriod: MomentumPeriod
   viewMode: FeedViewMode
-  density: FeedDensity
   canExportAll: boolean
   canExportSelected: boolean
   exporting: 'all' | 'selected' | null
@@ -45,7 +43,6 @@ type Props = {
   onClearNicheWindow: () => void
   onMomentumPeriod: (value: MomentumPeriod) => void
   onViewMode: (value: FeedViewMode) => void
-  onDensity: (value: FeedDensity) => void
   onExportAll: () => void
   onExportSelected: () => void
 }
@@ -60,7 +57,6 @@ export function FeedFilters({
   nicheWindow,
   momentumPeriod,
   viewMode,
-  density,
   canExportAll,
   canExportSelected,
   exporting,
@@ -73,7 +69,6 @@ export function FeedFilters({
   onClearNicheWindow,
   onMomentumPeriod,
   onViewMode,
-  onDensity,
   onExportAll,
   onExportSelected,
 }: Props) {
@@ -121,16 +116,6 @@ export function FeedFilters({
           />
         </label>
 
-        <button
-          type="button"
-          className="feed-toolbar-btn"
-          aria-expanded={drawerOpen}
-          onClick={() => setDrawerOpen(true)}
-        >
-          {t('filters.advancedTitle')}
-          {advancedCount > 0 ? <span className="feed-filter-badge">{advancedCount}</span> : null}
-        </button>
-
         <div className="feed-toolbar-group" role="group" aria-label={t('feed.viewMode')}>
           <button
             type="button"
@@ -150,26 +135,17 @@ export function FeedFilters({
           </button>
         </div>
 
-        <div className="feed-toolbar-group" role="group" aria-label={t('feed.density')}>
-          <button
-            type="button"
-            className={['feed-toolbar-btn', density === 'compact' && 'is-on'].filter(Boolean).join(' ')}
-            aria-pressed={density === 'compact'}
-            onClick={() => onDensity('compact')}
-          >
-            {t('feed.densityCompact')}
-          </button>
-          <button
-            type="button"
-            className={['feed-toolbar-btn', density === 'comfortable' && 'is-on'].filter(Boolean).join(' ')}
-            aria-pressed={density === 'comfortable'}
-            onClick={() => onDensity('comfortable')}
-          >
-            {t('feed.densityComfortable')}
-          </button>
-        </div>
+        <button
+          type="button"
+          className="feed-toolbar-btn"
+          aria-expanded={drawerOpen}
+          onClick={() => setDrawerOpen(true)}
+        >
+          {t('filters.advancedTitle')}
+          {advancedCount > 0 ? <span className="feed-filter-badge">{advancedCount}</span> : null}
+        </button>
 
-        <FeedOverflowMenu
+        <FeedExportDropdown
           canExportAll={canExportAll}
           canExportSelected={canExportSelected}
           exporting={exporting}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
-import './FeedOverflowMenu.css'
+import './FeedExportDropdown.css'
 
 type Props = {
   canExportAll: boolean
@@ -10,7 +10,7 @@ type Props = {
   onExportSelected: () => void
 }
 
-export function FeedOverflowMenu({
+export function FeedExportDropdown({
   canExportAll,
   canExportSelected,
   exporting,
@@ -33,19 +33,18 @@ export function FeedOverflowMenu({
   }, [open])
 
   return (
-    <div className="feed-overflow" ref={rootRef}>
+    <div className="feed-export" ref={rootRef}>
       <button
         type="button"
-        className="feed-toolbar-btn feed-overflow-trigger"
+        className="feed-toolbar-btn feed-export-trigger"
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={t('feed.moreActions')}
         onClick={() => setOpen((value) => !value)}
       >
-        ⋯
+        {t('feed.export')}
       </button>
       {open ? (
-        <div className="feed-overflow-menu" role="menu">
+        <div className="feed-export-menu" role="menu">
           <button
             type="button"
             role="menuitem"

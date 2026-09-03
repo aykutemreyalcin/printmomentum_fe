@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { FeedCardGrid } from '../components/FeedCardGrid'
-import { FeedFilters, type FeedDensity, type FeedViewMode } from '../components/FeedFilters'
+import { FeedFilters, type FeedViewMode } from '../components/FeedFilters'
 import { ListingFeedTable, loadFeedPageSize } from '../components/ListingFeedTable'
 import { getHealth } from '../api/client'
 import type { Health } from '../api/types'
@@ -15,7 +15,6 @@ import { formatCount, formatIstanbulClock } from '../lib/format'
 import './FeedPage.css'
 
 const VIEW_MODE_KEY = 'printmomentum-feed-view'
-const DENSITY_KEY = 'printmomentum-feed-density'
 
 function loadViewMode(): FeedViewMode {
   try {
@@ -27,16 +26,6 @@ function loadViewMode(): FeedViewMode {
   return 'table'
 }
 
-function loadDensity(): FeedDensity {
-  try {
-    const stored = localStorage.getItem(DENSITY_KEY)
-    if (stored === 'compact' || stored === 'comfortable') return stored
-  } catch {
-    /* ignore */
-  }
-  return 'compact'
-}
-
 export function FeedPage() {
   usePageTitle('title.feed')
   const { t } = useI18n()
@@ -45,7 +34,6 @@ export function FeedPage() {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: loadFeedPageSize() })
   const [exporting, setExporting] = useState<'all' | 'selected' | null>(null)
   const [viewMode, setViewMode] = useState<FeedViewMode>(() => loadViewMode())
-  const [density, setDensity] = useState<FeedDensity>(() => loadDensity())
   const filterKey = useMemo(
     () =>
       `${filters.maxDaysToTop ?? ''}|${filters.minScore ?? ''}|${filters.q}|${filters.preset ?? ''}|${filters.bestseller ? '1' : ''}|${filters.nicheSlug}|${filters.nicheWindow}|${filters.momentumPeriod}`,
@@ -79,10 +67,6 @@ export function FeedPage() {
   useEffect(() => {
     localStorage.setItem(VIEW_MODE_KEY, viewMode)
   }, [viewMode])
-
-  useEffect(() => {
-    localStorage.setItem(DENSITY_KEY, density)
-  }, [density])
 
   const indexEmpty = (health?.indexedListings ?? 0) === 0
   const filtersOn = Boolean(
@@ -161,7 +145,6 @@ export function FeedPage() {
         nicheWindow={filters.nicheWindow}
         momentumPeriod={filters.momentumPeriod}
         viewMode={viewMode}
-        density={density}
         canExportAll={canExportAll}
         canExportSelected={canExportSelected}
         exporting={exporting}
@@ -174,7 +157,6 @@ export function FeedPage() {
         onClearNicheWindow={() => filters.setNicheWindow('')}
         onMomentumPeriod={filters.setMomentumPeriod}
         onViewMode={setViewMode}
-        onDensity={setDensity}
         onExportAll={() => void exportAll()}
         onExportSelected={() => void exportSelected()}
       />
@@ -221,7 +203,6 @@ export function FeedPage() {
           onToggleFavorite={toggleFavorite}
           emptyMessage={emptyMessage}
           hideGlobalFilter
-          density={density}
         />
       )}
     </div>

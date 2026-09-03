@@ -1,15 +1,12 @@
-.feed-overflow {
+.feed-export {
   position: relative;
 }
 
-.feed-overflow-trigger {
-  min-width: 36px;
-  padding-inline: 10px;
-  font-size: 18px;
-  line-height: 1;
+.feed-export-trigger {
+  min-width: 72px;
 }
 
-.feed-overflow-menu {
+.feed-export-menu {
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
@@ -24,7 +21,7 @@
   box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
-.feed-overflow-menu button {
+.feed-export-menu button {
   width: 100%;
   padding: 8px 10px;
   border: 0;
@@ -36,11 +33,11 @@
   cursor: pointer;
 }
 
-.feed-overflow-menu button:hover:not(:disabled) {
+.feed-export-menu button:hover:not(:disabled) {
   background: var(--canvas);
 }
 
-.feed-overflow-menu button:disabled {
+.feed-export-menu button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
