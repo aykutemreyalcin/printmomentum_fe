@@ -105,6 +105,7 @@ export async function getListings(query: ListingsQuery = {}): Promise<ListingPag
 export async function getNiches(query: NichesQuery = {}): Promise<NichePage> {
   return request(`/v1/niches${toQuery({
     window: query.window,
+    q: query.q,
     sort: query.sort,
     page: query.page,
     size: query.size,
