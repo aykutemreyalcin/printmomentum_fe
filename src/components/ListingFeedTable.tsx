@@ -588,7 +588,15 @@ function ListingDetailPanel({
 }) {
   return (
     <div className="listing-detail-panel">
-      {listing.imageUrl ? <img src={listing.imageUrl} alt="" /> : null}
+      <div className="listing-detail-media">
+        {listing.imageUrl ? <img src={listing.imageUrl} alt="" /> : null}
+        <div className="listing-detail-media-links">
+          <Link to={`/listings/${listing.listingId}`}>{t('table.openListing')}</Link>
+          <a href={listing.etsyUrl} target="_blank" rel="noreferrer">
+            {t('table.viewEtsy')}
+          </a>
+        </div>
+      </div>
       <div className="listing-detail-body">
         {listing.shopId ? (
           <Link className="label" to={`/shops/${listing.shopId}`}>
@@ -658,10 +666,6 @@ function ListingDetailPanel({
         ) : null}
         <div className="listing-detail-links">
           <FavoriteButton favorite={Boolean(listing.favorite)} onToggle={() => onToggleFavorite(listing)} />
-          <Link to={`/listings/${listing.listingId}`}>{t('table.openListing')}</Link>
-          <a href={listing.etsyUrl} target="_blank" rel="noreferrer">
-            {t('table.viewEtsy')}
-          </a>
         </div>
       </div>
     </div>
