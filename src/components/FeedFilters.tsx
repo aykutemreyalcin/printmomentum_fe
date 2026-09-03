@@ -1,15 +1,11 @@
-import type { FeedPreset, MomentumPeriod, NicheWindowState } from '../api/types'
+import { useMemo, useState } from 'react'
+import type { FeedPreset, MomentumPeriod } from '../api/types'
 import { useI18n } from '../i18n/I18nProvider'
 import type { MessageKey } from '../i18n/messages'
+import { FeedActiveChips } from './FeedActiveChips'
+import { FeedFiltersDrawer } from './FeedFiltersDrawer'
+import { FeedOverflowMenu } from './FeedOverflowMenu'
 import './FeedFilters.css'
-
-const PRESETS: { id: FeedPreset; key: MessageKey }[] = [
-  { id: 'seen-today', key: 'filters.seenToday' },
-  { id: 'created-today', key: 'filters.openedToday' },
-  { id: 'created-7d', key: 'filters.opened7d' },
-  { id: 'reviewed-24h', key: 'filters.newReview' },
-  { id: 'climbing', key: 'filters.climbing' },
-]
 
 const MOMENTUM_PERIODS: { id: MomentumPeriod; key: MessageKey }[] = [
   { id: 'daily', key: 'filters.momentumDaily' },
@@ -17,31 +13,45 @@ const MOMENTUM_PERIODS: { id: MomentumPeriod; key: MessageKey }[] = [
   { id: 'monthly', key: 'filters.momentumMonthly' },
 ]
 
-const NICHE_WINDOWS: Array<{ id: NicheWindowState | ''; key: MessageKey }> = [
-  { id: '', key: 'filters.nicheWindowAll' },
-  { id: 'OPEN', key: 'niches.window.OPEN' },
-  { id: 'CLOSING', key: 'niches.window.CLOSING' },
-  { id: 'CLOSED', key: 'niches.window.CLOSED' },
+const QUICK_PRESETS: Array<{ id: FeedPreset | 'bestseller'; key: MessageKey }> = [
+  { id: 'climbing', key: 'filters.climbing' },
+  { id: 'created-today', key: 'filters.openedToday' },
+  { id: 'bestseller', key: 'filters.bestsellersOnly' },
 ]
 
+export type FeedViewMode = 'table' | 'cards'
+export type FeedDensity = 'compact' | 'comfortable'
+
 type Props = {
+  q: string
   maxDaysToTop: string
   minScore: string
   preset: string
   bestseller: boolean
   nicheSlug: string
-  nicheWindow: NicheWindowState | ''
+  nicheWindow: import('../api/types').NicheWindowState | ''
   momentumPeriod: MomentumPeriod
+  viewMode: FeedViewMode
+  density: FeedDensity
+  canExportAll: boolean
+  canExportSelected: boolean
+  exporting: 'all' | 'selected' | null
+  onQ: (value: string) => void
   onMaxDaysToTop: (value: string) => void
   onMinScore: (value: string) => void
   onPreset: (value: string) => void
   onBestseller: (value: boolean) => void
-  onNicheSlug: (value: string) => void
-  onNicheWindow: (value: NicheWindowState | '') => void
+  onClearNiche: () => void
+  onClearNicheWindow: () => void
   onMomentumPeriod: (value: MomentumPeriod) => void
+  onViewMode: (value: FeedViewMode) => void
+  onDensity: (value: FeedDensity) => void
+  onExportAll: () => void
+  onExportSelected: () => void
 }
 
 export function FeedFilters({
+  q,
   maxDaysToTop,
   minScore,
   preset,
@@ -49,20 +59,38 @@ export function FeedFilters({
   nicheSlug,
   nicheWindow,
   momentumPeriod,
+  viewMode,
+  density,
+  canExportAll,
+  canExportSelected,
+  exporting,
+  onQ,
   onMaxDaysToTop,
   onMinScore,
   onPreset,
   onBestseller,
-  onNicheSlug,
-  onNicheWindow,
+  onClearNiche,
+  onClearNicheWindow,
   onMomentumPeriod,
+  onViewMode,
+  onDensity,
+  onExportAll,
+  onExportSelected,
 }: Props) {
   const { t } = useI18n()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const advancedCount = useMemo(() => {
+    let count = 0
+    if (['seen-today', 'opened-7d', 'reviewed-24h'].includes(preset)) count += 1
+    if (maxDaysToTop) count += 1
+    if (minScore) count += 1
+    return count
+  }, [maxDaysToTop, minScore, preset])
 
   return (
-    <form className="feed-filters" onSubmit={(event) => event.preventDefault()}>
-      <section className="feed-momentum-bar">
-        <span className="label feed-section-label">{t('filters.momentumPeriod')}</span>
+    <div className="feed-filters">
+      <div className="feed-control-row">
         <div
           className="feed-momentum-segmented"
           role="group"
@@ -82,82 +110,124 @@ export function FeedFilters({
             </button>
           ))}
         </div>
-      </section>
 
-      <section className="feed-filter-bar">
-        <span className="label feed-section-label">{t('filters.filterSection')}</span>
-        <div className="feed-filter-row">
-          <div className="feed-presets" role="group" aria-label={t('filters.presets')}>
-            {PRESETS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={['feed-preset', preset === item.id && 'is-on'].filter(Boolean).join(' ')}
-                aria-pressed={preset === item.id}
-                onClick={() => onPreset(preset === item.id ? '' : item.id)}
-              >
-                {t(item.key)}
-              </button>
-            ))}
-          </div>
-          <div className="feed-presets feed-bestseller-filter" role="group" aria-label={t('filters.bestseller')}>
+        <label className="feed-search">
+          <span className="visually-hidden">{t('table.search')}</span>
+          <input
+            type="search"
+            value={q}
+            placeholder={t('table.search')}
+            onChange={(event) => onQ(event.target.value)}
+          />
+        </label>
+
+        <button
+          type="button"
+          className="feed-toolbar-btn"
+          aria-expanded={drawerOpen}
+          onClick={() => setDrawerOpen(true)}
+        >
+          {t('filters.advancedTitle')}
+          {advancedCount > 0 ? <span className="feed-filter-badge">{advancedCount}</span> : null}
+        </button>
+
+        <div className="feed-toolbar-group" role="group" aria-label={t('feed.viewMode')}>
+          <button
+            type="button"
+            className={['feed-toolbar-btn', viewMode === 'table' && 'is-on'].filter(Boolean).join(' ')}
+            aria-pressed={viewMode === 'table'}
+            onClick={() => onViewMode('table')}
+          >
+            {t('feed.viewTable')}
+          </button>
+          <button
+            type="button"
+            className={['feed-toolbar-btn', viewMode === 'cards' && 'is-on'].filter(Boolean).join(' ')}
+            aria-pressed={viewMode === 'cards'}
+            onClick={() => onViewMode('cards')}
+          >
+            {t('feed.viewCards')}
+          </button>
+        </div>
+
+        <div className="feed-toolbar-group" role="group" aria-label={t('feed.density')}>
+          <button
+            type="button"
+            className={['feed-toolbar-btn', density === 'compact' && 'is-on'].filter(Boolean).join(' ')}
+            aria-pressed={density === 'compact'}
+            onClick={() => onDensity('compact')}
+          >
+            {t('feed.densityCompact')}
+          </button>
+          <button
+            type="button"
+            className={['feed-toolbar-btn', density === 'comfortable' && 'is-on'].filter(Boolean).join(' ')}
+            aria-pressed={density === 'comfortable'}
+            onClick={() => onDensity('comfortable')}
+          >
+            {t('feed.densityComfortable')}
+          </button>
+        </div>
+
+        <FeedOverflowMenu
+          canExportAll={canExportAll}
+          canExportSelected={canExportSelected}
+          exporting={exporting}
+          onExportAll={onExportAll}
+          onExportSelected={onExportSelected}
+        />
+      </div>
+
+      <div className="feed-quick-row">
+        {QUICK_PRESETS.map((item) => {
+          const isOn = item.id === 'bestseller' ? bestseller : preset === item.id
+          return (
             <button
+              key={item.id}
               type="button"
-              className={['feed-preset', bestseller && 'is-on'].filter(Boolean).join(' ')}
-              aria-pressed={bestseller}
-              onClick={() => onBestseller(!bestseller)}
+              className={['feed-preset', isOn && 'is-on'].filter(Boolean).join(' ')}
+              aria-pressed={isOn}
+              onClick={() => {
+                if (item.id === 'bestseller') {
+                  onBestseller(!bestseller)
+                  return
+                }
+                onPreset(preset === item.id ? '' : item.id)
+              }}
             >
-              {t('filters.bestsellersOnly')}
+              {t(item.key)}
             </button>
-          </div>
-          <label>
-            <span className="label">{t('filters.maxDays')}</span>
-            <input
-              type="number"
-              min={0}
-              step="any"
-              inputMode="decimal"
-              value={maxDaysToTop}
-              onChange={(event) => onMaxDaysToTop(event.target.value)}
-            />
-          </label>
-          <label>
-            <span className="label">{t('filters.minScore')}</span>
-            <input
-              type="number"
-              min={0}
-              step="any"
-              inputMode="decimal"
-              value={minScore}
-              onChange={(event) => onMinScore(event.target.value)}
-            />
-          </label>
-          <label>
-            <span className="label">{t('filters.nicheSlug')}</span>
-            <input
-              type="text"
-              value={nicheSlug}
-              onChange={(event) => onNicheSlug(event.target.value)}
-              placeholder={t('filters.nicheSlugPlaceholder')}
-            />
-          </label>
-        </div>
-        <div className="feed-filter-row">
-          <div className="feed-presets" role="group" aria-label={t('filters.nicheWindow')}>
-            {NICHE_WINDOWS.map((item) => (
-              <button
-                key={item.id || 'all'}
-                type="button"
-                className={['feed-preset', nicheWindow === item.id && 'is-on'].filter(Boolean).join(' ')}
-                aria-pressed={nicheWindow === item.id}
-                onClick={() => onNicheWindow(item.id)}
-              >
-                {t(item.key)}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-    </form>
+          )
+        })}
+      </div>
+
+      <FeedActiveChips
+        q={q}
+        preset={preset}
+        bestseller={bestseller}
+        maxDaysToTop={maxDaysToTop}
+        minScore={minScore}
+        nicheSlug={nicheSlug}
+        nicheWindow={nicheWindow}
+        onClearQ={() => onQ('')}
+        onClearPreset={() => onPreset('')}
+        onClearBestseller={() => onBestseller(false)}
+        onClearMaxDays={() => onMaxDaysToTop('')}
+        onClearMinScore={() => onMinScore('')}
+        onClearNiche={onClearNiche}
+        onClearNicheWindow={onClearNicheWindow}
+      />
+
+      <FeedFiltersDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        maxDaysToTop={maxDaysToTop}
+        minScore={minScore}
+        preset={preset}
+        onMaxDaysToTop={onMaxDaysToTop}
+        onMinScore={onMinScore}
+        onPreset={onPreset}
+      />
+    </div>
   )
 }

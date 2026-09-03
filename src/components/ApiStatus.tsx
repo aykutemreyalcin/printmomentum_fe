@@ -6,7 +6,7 @@ import { formatIstanbulClock } from '../lib/format'
 import './ApiStatus.css'
 
 export function ApiStatus() {
-  const { t } = useI18n()
+  const { t, numberLocale } = useI18n()
   const [health, setHealth] = useState<Health | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -27,7 +27,7 @@ export function ApiStatus() {
   }, [t])
 
   if (health) {
-    const crawlLabel = crawlSummary(health, t)
+    const crawlLabel = crawlSummary(health, t, numberLocale)
     return (
       <span className="api-status label" data-testid="health" title={crawlTitle(health, t)}>
         <i className="api-status-dot" /> {t('api.ok', { status: health.status })}
@@ -51,20 +51,30 @@ export function ApiStatus() {
   )
 }
 
-function crawlSummary(health: Health, t: ReturnType<typeof useI18n>['t']): string | null {
+function crawlSummary(
+  health: Health,
+  t: ReturnType<typeof useI18n>['t'],
+  numberLocale: string,
+): string | null {
+  const indexed =
+    health.indexedListings != null && health.indexedListings > 0
+      ? t('api.indexed', {
+          count: new Intl.NumberFormat(numberLocale, { notation: 'compact' }).format(health.indexedListings),
+        })
+      : null
   if (health.lastOutcome === 'skipped_quota') {
-    return t('api.quota')
+    return [indexed, t('api.quota')].filter(Boolean).join(' · ')
   }
   if (health.lastOutcome === 'error') {
-    return t('api.crawlError')
+    return [indexed, t('api.crawlError')].filter(Boolean).join(' · ')
   }
   if (health.lastCrawlAt) {
-    return t('api.last', { time: formatIstanbulClock(health.lastCrawlAt) })
+    return [indexed, t('api.last', { time: formatIstanbulClock(health.lastCrawlAt) })].filter(Boolean).join(' · ')
   }
   if (health.nextCrawlAt) {
-    return t('api.next', { time: formatIstanbulClock(health.nextCrawlAt) })
+    return [indexed, t('api.next', { time: formatIstanbulClock(health.nextCrawlAt) })].filter(Boolean).join(' · ')
   }
-  return null
+  return indexed
 }
 
 function crawlTitle(health: Health, t: ReturnType<typeof useI18n>['t']): string {

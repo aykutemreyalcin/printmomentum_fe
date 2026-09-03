@@ -1,0 +1,76 @@
+.feed-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.feed-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 41;
+  width: min(360px, 100vw);
+  height: 100%;
+  padding: 16px;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  background: var(--surface);
+  border-left: 1px solid var(--hair);
+  box-shadow: -8px 0 24px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.feed-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.feed-drawer-head h3 {
+  font-size: 16px;
+}
+
+.feed-drawer-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--canvas);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.feed-drawer-section {
+  display: grid;
+  gap: 10px;
+}
+
+.feed-drawer-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.feed-drawer-fields label {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--canvas);
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+}
+
+.feed-drawer-fields input {
+  width: 100%;
+  padding: 2px 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 400 14px/1.2 var(--sans);
+}
+
+.feed-drawer-fields input:focus {
+  outline: none;
+}

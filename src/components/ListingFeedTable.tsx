@@ -37,10 +37,12 @@ type Props = {
   onSearch: (value: string) => void
   onToggleFavorite: (listing: ListingFeedItem) => void | Promise<void>
   emptyMessage?: string
+  hideGlobalFilter?: boolean
+  density?: 'compact' | 'comfortable'
 }
 
-const VISIBILITY_KEY = 'printmomentum-table-columns-feed-v4'
-const ORDER_KEY = 'printmomentum-table-order-feed-v4'
+const VISIBILITY_KEY = 'printmomentum-table-columns-feed-v5'
+const ORDER_KEY = 'printmomentum-table-order-feed-v5'
 const PAGE_SIZE_KEY = 'printmomentum-table-pagesize-feed-v2'
 
 const DEFAULT_ORDER = [
@@ -49,28 +51,31 @@ const DEFAULT_ORDER = [
   'rank',
   'image',
   'title',
+  'momentumScore',
+  'deltaFavorers7d',
+  'daysToTop',
   'shopName',
   'price',
   'numFavorers',
   'views',
   'reviews30d',
   'estSales30d',
-  'deltaFavorers7d',
   'deltaViews7d',
-  'daysToTop',
   'ageDays',
   'shopSales',
   'bestseller',
-  'momentumScore',
 ]
 
 /** Main table: core scan columns. All other fields live in the expand panel. */
 const DEFAULT_VISIBILITY: MRT_VisibilityState = {
+  shopName: false,
+  price: false,
+  numFavorers: false,
+  views: false,
+  bestseller: false,
+  deltaViews7d: false,
   reviews30d: false,
   estSales30d: false,
-  deltaFavorers7d: false,
-  deltaViews7d: false,
-  daysToTop: false,
   ageDays: false,
   shopSales: false,
   listingId: false,
@@ -99,6 +104,8 @@ export function ListingFeedTable({
   onSearch,
   onToggleFavorite,
   emptyMessage,
+  hideGlobalFilter = false,
+  density = 'compact',
 }: Props) {
   const { t } = useI18n()
   const glossary = useMemo(() => createMetricGlossary(t), [t])
@@ -128,7 +135,7 @@ export function ListingFeedTable({
     getRowId: (row) => String(row.listingId),
     enableStickyHeader: true,
     enableStickyFooter: true,
-    enableDensityToggle: true,
+    enableDensityToggle: false,
     enableFullScreenToggle: true,
     enableHiding: true,
     enableColumnOrdering: true,
@@ -152,8 +159,7 @@ export function ListingFeedTable({
     layoutMode: 'semantic',
     defaultColumn: { minSize: 88, size: 140 },
     initialState: {
-      density: 'compact',
-      showGlobalFilter: true,
+      showGlobalFilter: !hideGlobalFilter,
       showColumnFilters: false,
       columnPinning: { left: ['mrt-row-expand', 'favorite', 'rank', 'image'] },
     },
@@ -185,6 +191,7 @@ export function ListingFeedTable({
       columnOrder,
       pagination,
       globalFilter: search,
+      density,
     },
     onColumnVisibilityChange: (updater) => setColumnVisibility((prev) => apply(updater, prev)),
     onColumnOrderChange: (updater) => setColumnOrder((prev) => apply(updater, prev)),
@@ -218,7 +225,7 @@ export function ListingFeedTable({
     },
     muiTableContainerProps: {
       sx: {
-        maxHeight: 'calc(100svh - 260px)',
+        maxHeight: 'calc(100svh - 220px)',
         maxWidth: '100%',
         overflowX: 'auto',
         WebkitOverflowScrolling: 'touch',

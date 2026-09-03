@@ -40,6 +40,8 @@ export function useFeedFilters() {
       patchSearchParams(setSearchParams, { nicheWindow: value }),
     setMomentumPeriod: (value: MomentumPeriod) =>
       patchSearchParams(setSearchParams, { momentumPeriod: value === DEFAULT_MOMENTUM_PERIOD ? '' : value }),
+    clearNiche: () =>
+      patchSearchParams(setSearchParams, { nicheSlug: '', nicheWindow: '' }),
   }
 }
 

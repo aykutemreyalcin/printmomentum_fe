@@ -5,6 +5,10 @@ import { FeedPage } from './FeedPage'
 import { renderWithApp } from '../test/renderWithApp'
 import { listingFixture, stubApi } from '../test/stubApi'
 
+async function openOverflowMenu(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(await screen.findByRole('button', { name: 'More actions' }))
+}
+
 describe('FeedPage', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
@@ -27,7 +31,7 @@ describe('FeedPage', () => {
     expect(screen.queryByText('Y2K Chrome Butterfly Baby Tee')).not.toBeInTheDocument()
     expect(screen.getByText('3.10')).toBeInTheDocument()
     expect(screen.getByText('2.80')).toBeInTheDocument()
-    expect(screen.queryByRole('columnheader', { name: /reached top-n in/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: /reached top-n in/i })).toBeInTheDocument()
 
     await user.click(screen.getAllByRole('button', { name: 'Expand' })[0]!)
     expect(await screen.findByText('1.6 days')).toBeInTheDocument()
@@ -35,12 +39,14 @@ describe('FeedPage', () => {
 
   it('shows empty-state copy when the list is empty', async () => {
     stubApi({ items: [] })
+    const user = userEvent.setup()
 
     renderWithApp(<FeedPage />)
 
     expect(await screen.findByText('No printable tees match. Widen filters.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Export all' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Export selected' })).toBeDisabled()
+    await openOverflowMenu(user)
+    expect(screen.getByRole('menuitem', { name: 'Export all' })).toBeDisabled()
+    expect(screen.getByRole('menuitem', { name: 'Export selected' })).toBeDisabled()
   })
 
   it('explains a pending first crawl when the index has zero listings', async () => {
@@ -159,6 +165,7 @@ describe('FeedPage', () => {
 
     renderWithApp(<FeedPage />)
 
+    await user.click(await screen.findByRole('button', { name: 'Filters' }))
     await user.type(screen.getByLabelText('Max reached top-N in (days)'), '7')
 
     await waitFor(() => {
@@ -175,6 +182,28 @@ describe('FeedPage', () => {
     await waitFor(() => {
       expect(fetchMock.mock.calls.some((call) => String(call[0]).includes('maxDaysToTop=7'))).toBe(true)
     })
+  })
+
+  it('shows niche filter as a removable chip from the URL', async () => {
+    stubApi({ items: [] })
+
+    renderWithApp(<FeedPage />, '/?nicheSlug=dolly-parton')
+
+    expect(await screen.findByText('Niche: dolly-parton')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Niche slug')).not.toBeInTheDocument()
+  })
+
+  it('switches to card view', async () => {
+    stubApi({
+      items: [listingFixture({ listingId: 1, title: 'Card Tee Alpha', momentumScore: 2.2 })],
+    })
+    const user = userEvent.setup()
+
+    renderWithApp(<FeedPage />)
+
+    await user.click(await screen.findByRole('button', { name: 'Cards' }))
+    expect(await screen.findByText('Card Tee Alpha')).toBeInTheDocument()
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
   it('recovers the feed after retrying a 503', async () => {
@@ -247,5 +276,4 @@ describe('FeedPage', () => {
     )
     expect(await screen.findByRole('button', { name: 'Remove from favorites' })).toBeInTheDocument()
   })
-
 })
